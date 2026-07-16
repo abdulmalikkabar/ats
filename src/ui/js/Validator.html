@@ -1,0 +1,144 @@
+<script>
+
+/* ==========================================================
+ * ATS Validator Framework
+ * Version : 1.0
+ * ==========================================================
+ */
+
+ATS.validator = ATS.validator || {};
+
+/* ==========================================================
+ * Validate
+ * ==========================================================
+ */
+
+ATS.validator.validate = function(data, rules){
+
+    const errors = {};
+
+    Object.keys(rules).forEach(function(field){
+
+        const value = data[field];
+
+        const rule = rules[field];
+
+        const label = rule.label || field;
+
+        /* Required */
+
+        if(rule.required){
+
+            if(
+                value === undefined ||
+                value === null ||
+                String(value).trim() === ""
+            ){
+
+                errors[field] = label + " wajib diisi.";
+
+                return;
+
+            }
+
+        }
+
+        /* Minimum Length */
+
+        if(rule.minLength){
+
+            if(
+                String(value).length <
+                rule.minLength
+            ){
+
+                errors[field] =
+                    label +
+                    " minimal " +
+                    rule.minLength +
+                    " karakter.";
+
+                return;
+
+            }
+
+        }
+
+        /* Maximum Length */
+
+        if(rule.maxLength){
+
+            if(
+                String(value).length >
+                rule.maxLength
+            ){
+
+                errors[field] =
+                    label +
+                    " maksimal " +
+                    rule.maxLength +
+                    " karakter.";
+
+                return;
+
+            }
+
+        }
+
+    });
+
+    return{
+
+        valid:
+            Object.keys(errors).length===0,
+
+        errors:errors
+
+    };
+
+};
+
+function testValidator(){
+
+    const data = ATS.form.serialize("testForm");
+
+    const result = ATS.validator.validate(data,{
+
+        kode_atp:{
+            required:true,
+            label:"Kode ATP"
+        },
+
+        nama_atp:{
+            required:true,
+            minLength:5,
+            label:"Nama ATP"
+        },
+
+        fase:{
+            required:true,
+            label:"Fase"
+        }
+
+    });
+
+    console.log(result);
+
+    if(!result.valid){
+
+        ATS.form.setErrors(
+            "testForm",
+            result.errors
+        );
+
+        return;
+
+    }
+
+    ATS.toast.success("Validator berhasil.");
+
+}
+
+
+
+</script>
