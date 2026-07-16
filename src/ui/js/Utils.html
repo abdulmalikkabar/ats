@@ -1,0 +1,453 @@
+<script>
+
+/* ==========================================================
+ * ATS Utils Framework
+ * Version : 1.0
+ * ==========================================================
+ */
+
+ATS.utils = ATS.utils || {};
+
+/* ==========================================================
+ * UUID
+ * ==========================================================
+ */
+
+ATS.utils.uuid = function(){
+
+    if(
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID === "function"
+    ){
+        return crypto.randomUUID();
+    }
+
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(/[xy]/g, function(character){
+
+            const random = Math.random() * 16 | 0;
+
+            const value =
+                character === "x"
+                    ? random
+                    : (random & 0x3 | 0x8);
+
+            return value.toString(16);
+
+        });
+
+};
+
+/* ==========================================================
+ * Deep Clone
+ * ==========================================================
+ */
+
+ATS.utils.clone = function(value){
+
+    if(
+        typeof structuredClone === "function"
+    ){
+        return structuredClone(value);
+    }
+
+    return JSON.parse(
+        JSON.stringify(value)
+    );
+
+};
+
+/* ==========================================================
+ * Empty Check
+ * ==========================================================
+ */
+
+ATS.utils.isEmpty = function(value){
+
+    if(value === null || value === undefined){
+        return true;
+    }
+
+    if(typeof value === "string"){
+        return value.trim() === "";
+    }
+
+    if(Array.isArray(value)){
+        return value.length === 0;
+    }
+
+    if(typeof value === "object"){
+        return Object.keys(value).length === 0;
+    }
+
+    return false;
+
+};
+
+/* ==========================================================
+ * Random Integer
+ * ==========================================================
+ */
+
+ATS.utils.random = function(min = 0, max = 100){
+
+    min = Number(min);
+    max = Number(max);
+
+    if(min > max){
+        [min, max] = [max, min];
+    }
+
+    return Math.floor(
+        Math.random() * (max - min + 1)
+    ) + min;
+
+};
+
+/* ==========================================================
+ * Capitalize
+ * ==========================================================
+ */
+
+ATS.utils.capitalize = function(value){
+
+    const text = String(value || "").trim();
+
+    if(!text){
+        return "";
+    }
+
+    return text.charAt(0).toUpperCase() +
+        text.slice(1);
+
+};
+
+/* ==========================================================
+ * Title Case
+ * ==========================================================
+ */
+
+ATS.utils.titleCase = function(value){
+
+    return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\b\w/g, function(character){
+            return character.toUpperCase();
+        });
+
+};
+
+/* ==========================================================
+ * Camel Case
+ * ==========================================================
+ */
+
+ATS.utils.camelCase = function(value){
+
+    const words = String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .split(" ")
+        .filter(Boolean);
+
+    return words
+        .map(function(word, index){
+
+            if(index === 0){
+                return word;
+            }
+
+            return word.charAt(0).toUpperCase() +
+                word.slice(1);
+
+        })
+        .join("");
+
+};
+
+/* ==========================================================
+ * Snake Case
+ * ==========================================================
+ */
+
+ATS.utils.snakeCase = function(value){
+
+    return String(value || "")
+        .trim()
+        .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+        .replace(/[^a-zA-Z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .toLowerCase();
+
+};
+
+/* ==========================================================
+ * Slug
+ * ==========================================================
+ */
+
+ATS.utils.slug = function(value){
+
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+};
+
+/* ==========================================================
+ * Date Format
+ * ==========================================================
+ */
+
+ATS.utils.formatDate = function(
+    value,
+    locale = "id-ID",
+    options = {}
+){
+
+    if(!value){
+        return "";
+    }
+
+    const date =
+        value instanceof Date
+            ? value
+            : new Date(value);
+
+    if(Number.isNaN(date.getTime())){
+        return "";
+    }
+
+    const defaultOptions = {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    };
+
+    return new Intl.DateTimeFormat(
+        locale,
+        Object.assign(
+            {},
+            defaultOptions,
+            options
+        )
+    ).format(date);
+
+};
+
+/* ==========================================================
+ * Debounce
+ * ==========================================================
+ */
+
+ATS.utils.debounce = function(
+    callback,
+    delay = 300
+){
+
+    let timeoutId;
+
+    return function(...args){
+
+        const context = this;
+
+        clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(function(){
+
+            callback.apply(context, args);
+
+        }, delay);
+
+    };
+
+};
+
+/* ==========================================================
+ * Throttle
+ * ==========================================================
+ */
+
+ATS.utils.throttle = function(
+    callback,
+    delay = 300
+){
+
+    let waiting = false;
+
+    return function(...args){
+
+        if(waiting){
+            return;
+        }
+
+        waiting = true;
+
+        callback.apply(this, args);
+
+        setTimeout(function(){
+            waiting = false;
+        }, delay);
+
+    };
+
+};
+
+/* ==========================================================
+ * Copy Text
+ * ==========================================================
+ */
+
+ATS.utils.copy = function(text){
+
+    const value = String(text ?? "");
+
+    if(
+        navigator.clipboard &&
+        window.isSecureContext
+    ){
+        return navigator.clipboard.writeText(value);
+    }
+
+    return new Promise(function(resolve, reject){
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+
+        document.body.appendChild(textarea);
+
+        textarea.focus();
+        textarea.select();
+
+        try{
+
+            const successful =
+                document.execCommand("copy");
+
+            textarea.remove();
+
+            if(successful){
+                resolve();
+            }else{
+                reject(
+                    new Error("Gagal menyalin teks.")
+                );
+            }
+
+        }catch(error){
+
+            textarea.remove();
+            reject(error);
+
+        }
+
+    });
+
+};
+
+/* ==========================================================
+ * Download Text File
+ * ==========================================================
+ */
+
+ATS.utils.download = function(
+    filename,
+    content,
+    mimeType = "text/plain;charset=utf-8"
+){
+
+    const blob = new Blob(
+        [content],
+        {type: mimeType}
+    );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+    link.download = filename || "download.txt";
+
+    document.body.appendChild(link);
+
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+};
+
+function testUtils(){
+
+    const result = {
+
+        uuid: ATS.utils.uuid(),
+
+        clone: ATS.utils.clone({
+            nama: "ATP",
+            fase: "B"
+        }),
+
+        isEmpty1: ATS.utils.isEmpty(""),
+
+        isEmpty2: ATS.utils.isEmpty([]),
+
+        random: ATS.utils.random(1, 10),
+
+        capitalize:
+            ATS.utils.capitalize("matematika"),
+
+        titleCase:
+            ATS.utils.titleCase(
+                "alur tujuan pembelajaran"
+            ),
+
+        camelCase:
+            ATS.utils.camelCase(
+                "nama mata pelajaran"
+            ),
+
+        snakeCase:
+            ATS.utils.snakeCase(
+                "nama Mata Pelajaran"
+            ),
+
+        slug:
+            ATS.utils.slug(
+                "Alur Tujuan Pembelajaran"
+            ),
+
+        date:
+            ATS.utils.formatDate(
+                new Date()
+            )
+
+    };
+
+    console.log("[ATS Utils]", result);
+
+    const output =
+        document.getElementById("testUtilsResult");
+
+    if(output){
+        output.textContent =
+            JSON.stringify(result, null, 2);
+    }
+
+}
+
+
+
+</script>

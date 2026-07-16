@@ -9,25 +9,22 @@
     <title><?= Config.APP.NAME ?></title>
 
     <!-- ===================================================== -->
-    <!-- UI Framework CSS -->
+    <!-- UI FRAMEWORK CSS -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.css("Style_Main")) ?>
+    <?!= View.include(View.css("Loading")) ?>
     <?!= View.include(View.css("Toast")) ?>
     <?!= View.include(View.css("Dialog")) ?>
     <?!= View.include(View.css("Modal")) ?>
     <?!= View.include(View.css("Table")) ?>
     <?!= View.include(View.css("Form")) ?>
-    <?!= View.include(View.js("Validator")) ?>
-
 
     <!-- ===================================================== -->
-    <!-- Module CSS -->
+    <!-- MODULE CSS -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.module("atp", "Style_ATP")) ?>
-    
-
 
 </head>
 
@@ -70,7 +67,7 @@
     <?!= View.include(View.js("Script_Main")) ?>
 
     <!-- ===================================================== -->
-    <!-- UI COMPONENTS -->
+    <!-- UI FRAMEWORK JAVASCRIPT -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.js("Toast")) ?>
@@ -79,19 +76,11 @@
     <?!= View.include(View.js("Table")) ?>
     <?!= View.include(View.js("Form")) ?>
     <?!= View.include(View.js("Validator")) ?>
-
-
+    <?!= View.include(View.js("Utils")) ?>
 
     <!--
-        Sprint Berikutnya
-        =================
         Komponen berikutnya:
-            - Modal
-            - Table
-            - Form
-            - Storage
-            - Validator
-
+        - Storage
     -->
 
     <!-- ===================================================== -->
@@ -99,26 +88,22 @@
     <!-- ===================================================== -->
 
     <?!= View.include(View.module("atp", "Script_ATP")) ?>
-   
 
     <!--
-        Module Berikutnya
-        =================
+        Modul berikutnya:
         - Guru
         - Mapel
         - Kelas
-
     -->
 
     <!-- ===================================================== -->
-    <!-- GLOBAL COMPONENTS -->
+    <!-- GLOBAL COMPONENT TEMPLATES -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.loading("Loading")) ?>
     <?!= View.include(View.dialog("Dialog")) ?>
     <?!= View.include(View.modal("Modal")) ?>
-    <?!= View.include(View.table("Table")) ?>
-    
+
 </body>
 
 </html>
