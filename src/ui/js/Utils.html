@@ -389,65 +389,6 @@ ATS.utils.download = function(
 
 };
 
-function testUtils(){
-
-    const result = {
-
-        uuid: ATS.utils.uuid(),
-
-        clone: ATS.utils.clone({
-            nama: "ATP",
-            fase: "B"
-        }),
-
-        isEmpty1: ATS.utils.isEmpty(""),
-
-        isEmpty2: ATS.utils.isEmpty([]),
-
-        random: ATS.utils.random(1, 10),
-
-        capitalize:
-            ATS.utils.capitalize("matematika"),
-
-        titleCase:
-            ATS.utils.titleCase(
-                "alur tujuan pembelajaran"
-            ),
-
-        camelCase:
-            ATS.utils.camelCase(
-                "nama mata pelajaran"
-            ),
-
-        snakeCase:
-            ATS.utils.snakeCase(
-                "nama Mata Pelajaran"
-            ),
-
-        slug:
-            ATS.utils.slug(
-                "Alur Tujuan Pembelajaran"
-            ),
-
-        date:
-            ATS.utils.formatDate(
-                new Date()
-            )
-
-    };
-
-    console.log("[ATS Utils]", result);
-
-    const output =
-        document.getElementById("testUtilsResult");
-
-    if(output){
-        output.textContent =
-            JSON.stringify(result, null, 2);
-    }
-
-}
-
 
 
 </script>

@@ -98,46 +98,6 @@ ATS.validator.validate = function(data, rules){
 
 };
 
-function testValidator(){
-
-    const data = ATS.form.serialize("testForm");
-
-    const result = ATS.validator.validate(data,{
-
-        kode_atp:{
-            required:true,
-            label:"Kode ATP"
-        },
-
-        nama_atp:{
-            required:true,
-            minLength:5,
-            label:"Nama ATP"
-        },
-
-        fase:{
-            required:true,
-            label:"Fase"
-        }
-
-    });
-
-    console.log(result);
-
-    if(!result.valid){
-
-        ATS.form.setErrors(
-            "testForm",
-            result.errors
-        );
-
-        return;
-
-    }
-
-    ATS.toast.success("Validator berhasil.");
-
-}
 
 
 
