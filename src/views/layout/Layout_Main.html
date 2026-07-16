@@ -13,6 +13,7 @@
     <!-- ===================================================== -->
 
     <?!= View.include(View.css("Style_Main")) ?>
+    <?!= View.include(View.css("Toast")) ?>
 
     <!-- ===================================================== -->
     <!-- Module CSS -->
@@ -25,19 +26,19 @@
 <body>
 
     <!-- ===================================================== -->
-    <!-- Header -->
+    <!-- HEADER -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.layout("Layout_Header")) ?>
 
     <!-- ===================================================== -->
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.layout("Layout_Sidebar")) ?>
 
     <!-- ===================================================== -->
-    <!-- Main Content -->
+    <!-- MAIN CONTENT -->
     <!-- ===================================================== -->
 
     <main id="content" class="content">
@@ -47,40 +48,55 @@
     </main>
 
     <!-- ===================================================== -->
-    <!-- Footer -->
+    <!-- FOOTER -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.layout("Layout_Footer")) ?>
 
     <!-- ===================================================== -->
-    <!-- ATS Framework -->
+    <!-- ATS FRAMEWORK CORE -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.js("ATS")) ?>
-
+    <?!= View.include(View.js("API")) ?>
     <?!= View.include(View.js("Script_Main")) ?>
 
     <!-- ===================================================== -->
-    <!-- Module Script -->
+    <!-- UI COMPONENTS -->
+    <!-- ===================================================== -->
+
+    <?!= View.include(View.js("Toast")) ?>
+
+    <!--
+        Sprint Berikutnya
+        =================
+        <?!= View.include(View.js("Dialog")) ?>
+        <?!= View.include(View.js("Modal")) ?>
+        <?!= View.include(View.js("Table")) ?>
+        <?!= View.include(View.js("Form")) ?>
+        <?!= View.include(View.js("Storage")) ?>
+        <?!= View.include(View.js("Validator")) ?>
+    -->
+
+    <!-- ===================================================== -->
+    <!-- MODULE JAVASCRIPT -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.module("atp", "Script_ATP")) ?>
 
+    <!--
+        Module Berikutnya
+        =================
+        <?!= View.include(View.module("guru","Script_Guru")) ?>
+        <?!= View.include(View.module("mapel","Script_Mapel")) ?>
+        <?!= View.include(View.module("kelas","Script_Kelas")) ?>
+    -->
+
     <!-- ===================================================== -->
-    <!-- Loading Overlay -->
+    <!-- GLOBAL COMPONENTS -->
     <!-- ===================================================== -->
 
-    <div id="loadingOverlay" class="loading-overlay">
-
-        <div class="loading-spinner"></div>
-
-        <div class="loading-text">
-
-            Memuat...
-
-        </div>
-
-    </div>
+    <?!= View.include(View.loading("Loading")) ?>
 
 </body>
 

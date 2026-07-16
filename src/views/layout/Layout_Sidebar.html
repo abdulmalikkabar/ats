@@ -1,6 +1,6 @@
 <aside class="sidebar">
 
-    <!-- Logo / Judul -->
+    <!-- Logo -->
     <div class="sidebar-title">
         <h3>AI Teacher Studio</h3>
         <small>Version 1.0</small>
@@ -9,11 +9,11 @@
     <!-- Menu -->
     <ul class="sidebar-menu">
 
-        <li class="active" onclick="loadPage('Page_Dashboard', this)">
+        <li onclick="ATS.router.load('Page_Dashboard', this)">
             🏠 Dashboard
         </li>
 
-        <li onclick="loadPage('Page_ATP', this)">
+        <li onclick="ATS.router.load('Page_ATP', this)">
             📚 ATP
         </li>
 
@@ -55,17 +55,13 @@
 
     </ul>
 
-    <!-- Footer Sidebar -->
-    <div style="
-        margin-top:30px;
-        padding:15px;
-        text-align:center;
-        font-size:12px;
-        color:#777;
-        border-top:1px solid #DDD;">
+    <!-- Footer -->
+    <div class="sidebar-footer">
 
         <strong>ATS</strong><br>
+
         AI Teacher Studio<br>
+
         Version 1.0
 
     </div>

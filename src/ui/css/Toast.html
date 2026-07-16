@@ -1,0 +1,109 @@
+<style>
+
+/* ==========================================================
+   ATS Toast
+========================================================== */
+
+.toast-container{
+
+    position:fixed;
+
+    top:20px;
+
+    right:20px;
+
+    z-index:99999;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.toast{
+
+    min-width:280px;
+
+    max-width:380px;
+
+    padding:14px 18px;
+
+    border-radius:8px;
+
+    color:white;
+
+    font-size:14px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+
+    animation:toastIn .25s ease;
+
+}
+
+.toast-success{
+
+    background:#43A047;
+
+}
+
+.toast-error{
+
+    background:#E53935;
+
+}
+
+.toast-warning{
+
+    background:#FB8C00;
+
+}
+
+.toast-info{
+
+    background:#1976D2;
+
+}
+
+@keyframes toastIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+}
+
+@keyframes toastOut{
+
+    from{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:translateX(40px);
+
+    }
+
+}
+
+</style>

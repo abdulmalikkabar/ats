@@ -1,0 +1,95 @@
+<script>
+
+/* ==========================================================
+ * ATS Toast Framework
+ * ==========================================================
+ */
+
+ATS.toast = {};
+
+/* ==========================================================
+ * Container
+ * ==========================================================
+ */
+
+ATS.toast.container = function(){
+
+    let container = document.getElementById("ats-toast");
+
+    if(!container){
+
+        container = document.createElement("div");
+
+        container.id = "ats-toast";
+
+        container.className = "toast-container";
+
+        document.body.appendChild(container);
+
+    }
+
+    return container;
+
+};
+
+/* ==========================================================
+ * Show Toast
+ * ==========================================================
+ */
+
+ATS.toast.show = function(type,message,duration=3000){
+
+    const container = ATS.toast.container();
+
+    const toast = document.createElement("div");
+
+    toast.className = "toast toast-" + type;
+
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+    setTimeout(function(){
+
+        toast.style.animation = "toastOut .25s ease";
+
+        setTimeout(function(){
+
+            toast.remove();
+
+        },250);
+
+    },duration);
+
+};
+
+/* ==========================================================
+ * Shortcut
+ * ==========================================================
+ */
+
+ATS.toast.success = function(msg){
+
+    ATS.toast.show("success",msg);
+
+};
+
+ATS.toast.error = function(msg){
+
+    ATS.toast.show("error",msg);
+
+};
+
+ATS.toast.warning = function(msg){
+
+    ATS.toast.show("warning",msg);
+
+};
+
+ATS.toast.info = function(msg){
+
+    ATS.toast.show("info",msg);
+
+};
+
+</script>

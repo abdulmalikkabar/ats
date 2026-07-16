@@ -1,0 +1,68 @@
+<script>
+
+/* ==========================================================
+ * ATS API Framework
+ * Version : 1.0
+ * ==========================================================
+ */
+
+ATS.api = {};
+
+/* ==========================================================
+ * Universal Caller
+ * ==========================================================
+ */
+
+ATS.api.call = function(functionName, ...args){
+
+    ATS.loading.show();
+
+    return new Promise((resolve,reject)=>{
+
+        const runner = google.script.run
+
+            .withSuccessHandler(function(result){
+
+                ATS.loading.hide();
+
+                resolve(result);
+
+            })
+
+            .withFailureHandler(function(error){
+
+                ATS.loading.hide();
+
+                reject(error);
+
+            });
+
+        runner[functionName](...args);
+
+    });
+
+};
+
+/* ==========================================================
+ * Alias GET
+ * ==========================================================
+ */
+
+ATS.api.get = function(functionName,...args){
+
+    return ATS.api.call(functionName,...args);
+
+};
+
+/* ==========================================================
+ * Alias POST
+ * ==========================================================
+ */
+
+ATS.api.post = function(functionName,data){
+
+    return ATS.api.call(functionName,data);
+
+};
+
+</script>

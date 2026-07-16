@@ -1,113 +1,74 @@
 <script>
 
 /* ==========================================================
-   AI Teacher Studio Framework
-   Version 1.0
-========================================================== */
+ * ATS Router Implementation
+ * ==========================================================
+ */
 
-const ATS = {
+ATS.router.load = function(pageName, element){
 
-    showLoading(){
-
-        document
-            .getElementById("loadingOverlay")
-            .classList
-            .add("show");
-
-    },
-
-    hideLoading(){
-
-        document
-            .getElementById("loadingOverlay")
-            .classList
-            .remove("show");
-
-    }
-
-};
-
-let currentPage = "Page_Dashboard";
-
-/* ==========================================================
-   Load Page
-========================================================== */
-
-function loadPage(pageName, element){
-
-    if(pageName === currentPage){
+    if(pageName === this.currentPage){
         return;
     }
 
-    currentPage = pageName;
+    this.currentPage = pageName;
 
-    ATS.showLoading();
+    
 
-    google.script.run
+    ATS.api
 
-        .withSuccessHandler(function(html){
+    .call("getPage", pageName)
 
-            const content = document.getElementById("content");
+    .then((html)=>{
 
-            content.style.opacity = "0";
+        const content = document.getElementById("content");
 
-            setTimeout(function(){
+        content.style.opacity = "0";
 
-                content.innerHTML = html;
+        setTimeout(()=>{
 
-                content.style.transition = "opacity .25s";
+            content.innerHTML = html;
 
-                content.style.opacity = "1";
+            content.style.transition = "opacity .25s";
 
-                ATS.hideLoading();
+            content.style.opacity = "1";
 
-            },200);
+            ATS.loading.hide();
 
-        })
+        },200);
 
-        .withFailureHandler(function(err){
+    })
 
-            ATS.hideLoading();
+    .catch((err)=>{
 
-            document.getElementById("content").innerHTML =
+     
 
-            `
-                <div class="card">
+        document.getElementById("content").innerHTML = `
+            <div class="card">
+                <h3 style="color:red">
+                    Gagal Memuat Halaman
+                </h3>
+                <br>
+                ${err.message}
+            </div>
+        `;
 
-                    <h3 style="color:red">
+    });
 
-                        Gagal Memuat Halaman
+    ATS.router.active(element);
 
-                    </h3>
-
-                    <br>
-
-                    ${err.message}
-
-                </div>
-            `;
-
-        })
-
-        .getPage(pageName);
-
-    setActiveMenu(element);
-
-}
+};
 
 /* ==========================================================
-   Active Menu
-========================================================== */
+ * Active Menu
+ * ==========================================================
+ */
 
-function setActiveMenu(element){
+ATS.router.active = function(element){
 
     document
         .querySelectorAll(".sidebar-menu li")
-        .forEach(function(item){
-
-            item.classList.remove("active");
-
-        });
+        .forEach(item => item.classList.remove("active"));
 
     if(element){
 
@@ -115,11 +76,12 @@ function setActiveMenu(element){
 
     }
 
-}
+};
 
 /* ==========================================================
-   Startup
-========================================================== */
+ * Startup
+ * ==========================================================
+ */
 
 window.onload = function(){
 
