@@ -1,0 +1,526 @@
+<script>
+
+/* ==========================================================
+ * ATS Storage Framework
+ * Version : 1.0
+ * ==========================================================
+ */
+
+ATS.storage = ATS.storage || {};
+
+ATS.storage.memory = ATS.storage.memory || {};
+
+ATS.storage.prefix = "ATS_";
+
+/* ==========================================================
+ * Get Storage Driver
+ * ==========================================================
+ */
+
+ATS.storage.getDriver = function(driver = "local"){
+
+    switch(driver){
+
+        case "local":
+            return window.localStorage;
+
+        case "session":
+            return window.sessionStorage;
+
+        case "memory":
+            return null;
+
+        default:
+            console.warn(
+                "[ATS Storage] Driver tidak dikenal:",
+                driver
+            );
+
+            return window.localStorage;
+
+    }
+
+};
+
+/* ==========================================================
+ * Build Key
+ * ==========================================================
+ */
+
+ATS.storage.key = function(key){
+
+    return ATS.storage.prefix + String(key);
+
+};
+
+/* ==========================================================
+ * Serialize
+ * ==========================================================
+ */
+
+ATS.storage.serialize = function(value){
+
+    return JSON.stringify({
+        value: value,
+        timestamp: Date.now()
+    });
+
+};
+
+/* ==========================================================
+ * Deserialize
+ * ==========================================================
+ */
+
+ATS.storage.deserialize = function(value){
+
+    if(value === null || value === undefined){
+        return null;
+    }
+
+    try{
+
+        const parsed = JSON.parse(value);
+
+        if(
+            parsed &&
+            Object.prototype.hasOwnProperty.call(
+                parsed,
+                "value"
+            )
+        ){
+            return parsed;
+        }
+
+        return {
+            value: parsed,
+            timestamp: null
+        };
+
+    }catch(error){
+
+        return {
+            value: value,
+            timestamp: null
+        };
+
+    }
+
+};
+
+/* ==========================================================
+ * Set
+ * ==========================================================
+ */
+
+ATS.storage.set = function(
+    key,
+    value,
+    options = {}
+){
+
+    const driver = options.driver || "local";
+
+    const storageKey =
+        ATS.storage.key(key);
+
+    const payload = {
+        value: value,
+        timestamp: Date.now(),
+        expiresAt: options.ttl
+            ? Date.now() + Number(options.ttl)
+            : null
+    };
+
+    if(driver === "memory"){
+
+        ATS.storage.memory[storageKey] =
+            payload;
+
+        return value;
+
+    }
+
+    const storage =
+        ATS.storage.getDriver(driver);
+
+    if(!storage){
+        return null;
+    }
+
+    try{
+
+        storage.setItem(
+            storageKey,
+            JSON.stringify(payload)
+        );
+
+        return value;
+
+    }catch(error){
+
+        console.error(
+            "[ATS Storage] Gagal menyimpan data:",
+            error
+        );
+
+        return null;
+
+    }
+
+};
+
+/* ==========================================================
+ * Get
+ * ==========================================================
+ */
+
+ATS.storage.get = function(
+    key,
+    defaultValue = null,
+    options = {}
+){
+
+    const driver = options.driver || "local";
+
+    const storageKey =
+        ATS.storage.key(key);
+
+    let payload = null;
+
+    if(driver === "memory"){
+
+        payload =
+            ATS.storage.memory[storageKey] || null;
+
+    }else{
+
+        const storage =
+            ATS.storage.getDriver(driver);
+
+        if(!storage){
+            return defaultValue;
+        }
+
+        const raw =
+            storage.getItem(storageKey);
+
+        if(raw === null){
+            return defaultValue;
+        }
+
+        try{
+
+            payload = JSON.parse(raw);
+
+        }catch(error){
+
+            console.warn(
+                "[ATS Storage] Data rusak:",
+                storageKey
+            );
+
+            return defaultValue;
+
+        }
+
+    }
+
+    if(!payload){
+        return defaultValue;
+    }
+
+    if(
+        payload.expiresAt &&
+        Date.now() > payload.expiresAt
+    ){
+
+        ATS.storage.remove(
+            key,
+            {driver: driver}
+        );
+
+        return defaultValue;
+
+    }
+
+    return Object.prototype
+        .hasOwnProperty.call(payload, "value")
+            ? payload.value
+            : defaultValue;
+
+};
+
+/* ==========================================================
+ * Has
+ * ==========================================================
+ */
+
+ATS.storage.has = function(
+    key,
+    options = {}
+){
+
+    const marker = {};
+
+    return ATS.storage.get(
+        key,
+        marker,
+        options
+    ) !== marker;
+
+};
+
+/* ==========================================================
+ * Remove
+ * ==========================================================
+ */
+
+ATS.storage.remove = function(
+    key,
+    options = {}
+){
+
+    const driver = options.driver || "local";
+
+    const storageKey =
+        ATS.storage.key(key);
+
+    if(driver === "memory"){
+
+        delete ATS.storage.memory[storageKey];
+
+        return true;
+
+    }
+
+    const storage =
+        ATS.storage.getDriver(driver);
+
+    if(!storage){
+        return false;
+    }
+
+    storage.removeItem(storageKey);
+
+    return true;
+
+};
+
+/* ==========================================================
+ * Clear ATS Storage
+ * ==========================================================
+ */
+
+ATS.storage.clear = function(
+    options = {}
+){
+
+    const driver = options.driver || "local";
+
+    if(driver === "memory"){
+
+        ATS.storage.memory = {};
+
+        return true;
+
+    }
+
+    const storage =
+        ATS.storage.getDriver(driver);
+
+    if(!storage){
+        return false;
+    }
+
+    const keys = [];
+
+    for(let index = 0; index < storage.length; index++){
+
+        const key = storage.key(index);
+
+        if(
+            key &&
+            key.startsWith(
+                ATS.storage.prefix
+            )
+        ){
+            keys.push(key);
+        }
+
+    }
+
+    keys.forEach(function(key){
+        storage.removeItem(key);
+    });
+
+    return true;
+
+};
+
+/* ==========================================================
+ * Get All ATS Data
+ * ==========================================================
+ */
+
+ATS.storage.all = function(
+    options = {}
+){
+
+    const driver = options.driver || "local";
+    const result = {};
+
+    if(driver === "memory"){
+
+        Object.keys(
+            ATS.storage.memory
+        ).forEach(function(storageKey){
+
+            const key =
+                storageKey.replace(
+                    ATS.storage.prefix,
+                    ""
+                );
+
+            result[key] =
+                ATS.storage.get(
+                    key,
+                    null,
+                    {driver: "memory"}
+                );
+
+        });
+
+        return result;
+
+    }
+
+    const storage =
+        ATS.storage.getDriver(driver);
+
+    if(!storage){
+        return result;
+    }
+
+    for(let index = 0; index < storage.length; index++){
+
+        const storageKey =
+            storage.key(index);
+
+        if(
+            !storageKey ||
+            !storageKey.startsWith(
+                ATS.storage.prefix
+            )
+        ){
+            continue;
+        }
+
+        const key =
+            storageKey.slice(
+                ATS.storage.prefix.length
+            );
+
+        result[key] =
+            ATS.storage.get(
+                key,
+                null,
+                {driver: driver}
+            );
+
+    }
+
+    return result;
+
+};
+
+/* ==========================================================
+ * Temporary Test
+ * ==========================================================
+ */
+
+function testStorage(){
+
+    ATS.storage.set(
+        "user_settings",
+        {
+            theme: "dark",
+            language: "id"
+        }
+    );
+
+    ATS.storage.set(
+        "session_test",
+        "Session aktif",
+        {
+            driver: "session"
+        }
+    );
+
+    ATS.storage.set(
+        "memory_test",
+        {
+            status: true
+        },
+        {
+            driver: "memory"
+        }
+    );
+
+    const result = {
+
+        local:
+            ATS.storage.get(
+                "user_settings"
+            ),
+
+        session:
+            ATS.storage.get(
+                "session_test",
+                null,
+                {
+                    driver: "session"
+                }
+            ),
+
+        memory:
+            ATS.storage.get(
+                "memory_test",
+                null,
+                {
+                    driver: "memory"
+                }
+            ),
+
+        hasLocal:
+            ATS.storage.has(
+                "user_settings"
+            ),
+
+        allLocal:
+            ATS.storage.all()
+
+    };
+
+    const output =
+        document.getElementById(
+            "testStorageResult"
+        );
+
+    if(output){
+        output.textContent =
+            JSON.stringify(
+                result,
+                null,
+                2
+            );
+    }
+
+    console.log(
+        "[ATS Storage]",
+        result
+    );
+
+}
+
+</script>

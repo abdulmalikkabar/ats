@@ -6,15 +6,32 @@
 
 
 
-<button
-    type="button"
-    class="btn btn-primary"
-    onclick="testUtils()"
->
-    Test Utils
-</button>
+<section class="card">
 
-<pre id="testUtilsResult"></pre>
+    <h3>Test ATS Storage</h3>
+
+    <button
+        type="button"
+        class="btn btn-primary"
+        onclick="testStorage()"
+    >
+        Test Storage
+    </button>
+
+    <button
+        type="button"
+        class="btn"
+        onclick="
+            ATS.storage.clear();
+            testStorageResult.textContent = 'Local storage ATS dibersihkan.';
+        "
+    >
+        Clear Local
+    </button>
+
+    <pre id="testStorageResult"></pre>
+
+</section>
 
 
 
