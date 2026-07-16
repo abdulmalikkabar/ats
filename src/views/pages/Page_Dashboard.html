@@ -22,4 +22,100 @@
 <div id="testTable"></div>
 
 
+<section class="card">
+
+    <h3>Test ATS Form</h3>
+
+    <form id="testForm">
+
+        <div class="form-group">
+            <label class="form-label" for="kode_atp">
+                Kode ATP
+            </label>
+
+            <input
+                type="text"
+                id="kode_atp"
+                name="kode_atp"
+                class="form-control"
+                placeholder="Contoh: ATP-001"
+            >
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="nama_atp">
+                Nama ATP
+            </label>
+
+            <input
+                type="text"
+                id="nama_atp"
+                name="nama_atp"
+                class="form-control"
+                placeholder="Nama ATP"
+            >
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="fase">
+                Fase
+            </label>
+
+            <select
+                id="fase"
+                name="fase"
+                class="form-control"
+            >
+                <option value="">Pilih fase</option>
+                <option value="A">Fase A</option>
+                <option value="B">Fase B</option>
+                <option value="C">Fase C</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="aktif"
+                    value="true"
+                >
+                Aktif
+            </label>
+
+        </div>
+
+        <button
+            type="button"
+            class="btn"
+            onclick="testSerializeForm()"
+        >
+            Test Serialize
+        </button>
+
+        <button
+            type="button"
+            class="btn"
+            onclick="testFillForm()"
+        >
+            Test Fill
+        </button>
+
+        <button
+            type="button"
+            class="btn"
+            onclick="ATS.form.reset('testForm')"
+        >
+            Reset
+        </button>
+
+    </form>
+
+    <pre id="testFormResult"></pre>
+
+</section>
+
+
+
 </main>

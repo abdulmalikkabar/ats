@@ -607,4 +607,45 @@ function testLoadATP(){
 
 }
 
+/* ==========================================================
+ * Temporary Form Tests
+ * Hapus setelah pengujian selesai
+ * ==========================================================
+ */
+
+function testSerializeForm(){
+
+    const data = ATS.form.serialize("testForm");
+
+    const output =
+        document.getElementById("testFormResult");
+
+    if(output){
+        output.textContent =
+            JSON.stringify(data, null, 2);
+    }
+
+    console.log("[ATS Form Serialize]", data);
+
+}
+
+function testFillForm(){
+
+    ATS.form.fill("testForm", {
+
+        kode_atp: "ATP-TEST-001",
+
+        nama_atp: "ATP Percobaan",
+
+        fase: "B",
+
+        aktif: true
+
+    });
+
+}
+
+
+
+
 </script>
