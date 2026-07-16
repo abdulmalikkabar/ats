@@ -1,0 +1,45 @@
+<script>
+
+function loadATP(){
+
+    google.script.run
+        .withSuccessHandler(renderATP)
+        .getAllATP();
+
+}
+
+function renderATP(data){
+
+    let html="";
+
+    data.forEach((item,index)=>{
+
+        html += `
+        <tr>
+
+            <td>${index+1}</td>
+
+            <td>${item.TAHUN}</td>
+
+            <td>${item.SEMESTER}</td>
+
+            <td>${item.KELAS}</td>
+
+            <td>${item.MAPEL}</td>
+
+            <td>
+
+                Edit
+
+            </td>
+
+        </tr>
+        `;
+
+    });
+
+    document.getElementById("tblATP").innerHTML=html;
+
+}
+
+</script>

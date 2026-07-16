@@ -1,24 +1,86 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
 
-<base target="_top">
+    <base target="_top">
+    <meta charset="UTF-8">
 
-<?!= include(View.css("Style_Main")) ?>
+    <title><?= Config.APP.NAME ?></title>
+
+    <!-- ===================================================== -->
+    <!-- UI Framework CSS -->
+    <!-- ===================================================== -->
+
+    <?!= View.include(View.css("Style_Main")) ?>
+
+    <!-- ===================================================== -->
+    <!-- Module CSS -->
+    <!-- ===================================================== -->
+
+    <?!= View.include(View.module("atp", "Style_ATP")) ?>
 
 </head>
 
 <body>
 
-<?!= include(View.layout("Layout_Header")) ?>
+    <!-- ===================================================== -->
+    <!-- Header -->
+    <!-- ===================================================== -->
 
-<?!= include(View.layout("Layout_Sidebar")) ?>
+    <?!= View.include(View.layout("Layout_Header")) ?>
 
-<?!= include(View.page("Page_Dashboard")) ?>
+    <!-- ===================================================== -->
+    <!-- Sidebar -->
+    <!-- ===================================================== -->
 
-<?!= include(View.layout("Layout_Footer")) ?>
+    <?!= View.include(View.layout("Layout_Sidebar")) ?>
+
+    <!-- ===================================================== -->
+    <!-- Main Content -->
+    <!-- ===================================================== -->
+
+    <main id="content" class="content">
+
+        <?!= View.include(View.page("Page_Dashboard")) ?>
+
+    </main>
+
+    <!-- ===================================================== -->
+    <!-- Footer -->
+    <!-- ===================================================== -->
+
+    <?!= View.include(View.layout("Layout_Footer")) ?>
+
+    <!-- ===================================================== -->
+    <!-- ATS Framework -->
+    <!-- ===================================================== -->
+
+    <?!= View.include(View.js("ATS")) ?>
+
+    <?!= View.include(View.js("Script_Main")) ?>
+
+    <!-- ===================================================== -->
+    <!-- Module Script -->
+    <!-- ===================================================== -->
+
+    <?!= View.include(View.module("atp", "Script_ATP")) ?>
+
+    <!-- ===================================================== -->
+    <!-- Loading Overlay -->
+    <!-- ===================================================== -->
+
+    <div id="loadingOverlay" class="loading-overlay">
+
+        <div class="loading-spinner"></div>
+
+        <div class="loading-text">
+
+            Memuat...
+
+        </div>
+
+    </div>
 
 </body>
 

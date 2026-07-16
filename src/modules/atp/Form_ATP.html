@@ -1,0 +1,185 @@
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            Form ATP
+        </h5>
+    </div>
+
+    <div class="card-body">
+
+        <form id="formATP">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        Sekolah
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="SEKOLAH_ID">
+
+                        <option value="">
+                            -- Pilih Sekolah --
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+                        Mata Pelajaran
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="MAPEL_ID">
+
+                        <option value="">
+                            -- Pilih Mapel --
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+                        Kelas
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="KELAS_ID">
+
+                        <option value="">
+                            -- Pilih Kelas --
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+                        Fase
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="FASE_ID">
+
+                        <option value="">
+                            -- Pilih Fase --
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+                        Semester
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="SEMESTER">
+
+                        <option value="1">
+                            Semester 1
+                        </option>
+
+                        <option value="2">
+                            Semester 2
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+                        Tahun Ajaran
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="TAHUN_AJARAN"
+                        placeholder="2025/2026">
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+                        Kode ATP
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="KODE_ATP"
+                        placeholder="ATP-001">
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">
+                        Versi
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="VERSI"
+                        value="1.0">
+
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Keterangan
+                </label>
+
+                <textarea
+                    class="form-control"
+                    rows="4"
+                    id="KETERANGAN"></textarea>
+
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                id="btnSaveATP">
+
+                Simpan ATP
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
