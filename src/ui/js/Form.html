@@ -1,0 +1,426 @@
+<script>
+
+/* ==========================================================
+ * ATS Form Framework v1.0
+ * ==========================================================
+ */
+
+ATS.form = ATS.form || {};
+
+/* ==========================================================
+ * Get Form
+ * ==========================================================
+ */
+
+ATS.form.get = function(formId){
+
+    const form = document.getElementById(formId);
+
+    if(!form){
+        console.error("[ATS Form] Form tidak ditemukan:", formId);
+        return null;
+    }
+
+    return form;
+
+};
+
+/* ==========================================================
+ * Serialize Form
+ * ==========================================================
+ */
+
+ATS.form.serialize = function(formId){
+
+    const form = ATS.form.get(formId);
+
+    if(!form){
+        return {};
+    }
+
+    const formData = new FormData(form);
+    const data = {};
+
+    formData.forEach(function(value, key){
+
+        if(Object.prototype.hasOwnProperty.call(data, key)){
+
+            if(!Array.isArray(data[key])){
+                data[key] = [data[key]];
+            }
+
+            data[key].push(value);
+
+        }else{
+
+            data[key] = value;
+
+        }
+
+    });
+
+    form.querySelectorAll(
+        'input[type="checkbox"][name]'
+    ).forEach(function(input){
+
+        if(!input.checked && !data[input.name]){
+            data[input.name] = false;
+        }
+
+    });
+
+    return data;
+
+};
+
+/* ==========================================================
+ * Fill Form
+ * ==========================================================
+ */
+
+ATS.form.fill = function(formId, data = {}){
+
+    const form = ATS.form.get(formId);
+
+    if(!form){
+        return;
+    }
+
+    Object.keys(data).forEach(function(name){
+
+        const fields = form.querySelectorAll(
+            `[name="${CSS.escape(name)}"]`
+        );
+
+        fields.forEach(function(field){
+
+            const value = data[name];
+
+            if(field.type === "checkbox"){
+
+                if(Array.isArray(value)){
+                    field.checked = value.includes(field.value);
+                }else{
+                    field.checked =
+                        value === true ||
+                        value === field.value ||
+                        value === "true";
+                }
+
+            }else if(field.type === "radio"){
+
+                field.checked =
+                    String(field.value) === String(value);
+
+            }else{
+
+                field.value =
+                    value === null || value === undefined
+                        ? ""
+                        : value;
+
+            }
+
+        });
+
+    });
+
+};
+
+/* ==========================================================
+ * Reset Form
+ * ==========================================================
+ */
+
+ATS.form.reset = function(formId){
+
+    const form = ATS.form.get(formId);
+
+    if(!form){
+        return;
+    }
+
+    form.reset();
+    ATS.form.clearErrors(formId);
+
+};
+
+/* ==========================================================
+ * Form State
+ * ==========================================================
+ */
+
+ATS.form.setSubmitting = function(
+    formId,
+    submitting,
+    message = "Menyimpan..."
+){
+
+    const form = ATS.form.get(formId);
+
+    if(!form){
+        return;
+    }
+
+    const controls = form.querySelectorAll(
+        "button, input, select, textarea"
+    );
+
+    controls.forEach(function(control){
+
+        if(submitting){
+
+            control.dataset.atsWasDisabled =
+                control.disabled ? "true" : "false";
+
+            control.disabled = true;
+
+        }else{
+
+            control.disabled =
+                control.dataset.atsWasDisabled === "true";
+
+            delete control.dataset.atsWasDisabled;
+
+        }
+
+    });
+
+    const submitButton = form.querySelector(
+        '[type="submit"]'
+    );
+
+    if(!submitButton){
+        return;
+    }
+
+    if(submitting){
+
+        submitButton.dataset.atsOriginalText =
+            submitButton.innerHTML;
+
+        submitButton.innerHTML =
+            ATS.table && ATS.table.escapeHTML
+                ? ATS.table.escapeHTML(message)
+                : message;
+
+    }else if(submitButton.dataset.atsOriginalText){
+
+        submitButton.innerHTML =
+            submitButton.dataset.atsOriginalText;
+
+        delete submitButton.dataset.atsOriginalText;
+
+    }
+
+};
+
+/* ==========================================================
+ * Field Errors
+ * ==========================================================
+ */
+
+ATS.form.clearErrors = function(formId){
+
+    const form = ATS.form.get(formId);
+
+    if(!form){
+        return;
+    }
+
+    form.querySelectorAll(".is-invalid")
+        .forEach(function(field){
+            field.classList.remove("is-invalid");
+        });
+
+    form.querySelectorAll(".form-error")
+        .forEach(function(error){
+            error.remove();
+        });
+
+};
+
+ATS.form.setErrors = function(formId, errors = {}){
+
+    const form = ATS.form.get(formId);
+
+    if(!form){
+        return;
+    }
+
+    ATS.form.clearErrors(formId);
+
+    Object.keys(errors).forEach(function(name){
+
+        const field = form.querySelector(
+            `[name="${CSS.escape(name)}"]`
+        );
+
+        if(!field){
+            return;
+        }
+
+        field.classList.add("is-invalid");
+
+        const errorElement =
+            document.createElement("div");
+
+        errorElement.className = "form-error";
+        errorElement.textContent = errors[name];
+
+        field.insertAdjacentElement(
+            "afterend",
+            errorElement
+        );
+
+    });
+
+};
+
+/* ==========================================================
+ * Submit Form
+ * ==========================================================
+ */
+
+ATS.form.submit = function(options = {}){
+
+    const formId = options.form;
+    const apiName = options.api;
+
+    if(!formId){
+        return Promise.reject(
+            new Error("Form ID belum ditentukan.")
+        );
+    }
+
+    if(!apiName){
+        return Promise.reject(
+            new Error("Nama API belum ditentukan.")
+        );
+    }
+
+    const form = ATS.form.get(formId);
+
+    if(!form){
+        return Promise.reject(
+            new Error("Form tidak ditemukan: " + formId)
+        );
+    }
+
+    ATS.form.clearErrors(formId);
+
+    const data = ATS.form.serialize(formId);
+
+    if(typeof options.beforeSubmit === "function"){
+
+        const beforeResult =
+            options.beforeSubmit(data, form);
+
+        if(beforeResult === false){
+            return Promise.resolve(null);
+        }
+
+    }
+
+    ATS.form.setSubmitting(
+        formId,
+        true,
+        options.submittingMessage || "Menyimpan..."
+    );
+
+    return ATS.api.call(apiName, data)
+
+        .then(function(result){
+
+            if(
+                ATS.toast &&
+                typeof ATS.toast.success === "function"
+            ){
+                ATS.toast.success(
+                    options.successMessage ||
+                    "Data berhasil disimpan."
+                );
+            }
+
+            if(typeof options.onSuccess === "function"){
+                options.onSuccess(result, data);
+            }
+
+            return result;
+
+        })
+
+        .catch(function(error){
+
+            console.error("[ATS Form]", error);
+
+            if(
+                error &&
+                error.validationErrors &&
+                typeof error.validationErrors === "object"
+            ){
+                ATS.form.setErrors(
+                    formId,
+                    error.validationErrors
+                );
+            }
+
+            if(
+                ATS.toast &&
+                typeof ATS.toast.error === "function"
+            ){
+                ATS.toast.error(
+                    options.errorMessage ||
+                    error.message ||
+                    "Data gagal disimpan."
+                );
+            }
+
+            if(typeof options.onError === "function"){
+                options.onError(error);
+            }
+
+            throw error;
+
+        })
+
+        .finally(function(){
+
+            ATS.form.setSubmitting(formId, false);
+
+        });
+
+};
+
+/* ==========================================================
+ * Bind Native Submit
+ * ==========================================================
+ */
+
+ATS.form.bind = function(options = {}){
+
+    const form = ATS.form.get(options.form);
+
+    if(!form){
+        return;
+    }
+
+    if(form.dataset.atsFormBound === "true"){
+        return;
+    }
+
+    form.dataset.atsFormBound = "true";
+
+    form.addEventListener("submit", function(event){
+
+        event.preventDefault();
+
+        ATS.form.submit(options).catch(function(){
+            // Error sudah ditangani ATS.form.submit().
+        });
+
+    });
+
+};
+
+</script>

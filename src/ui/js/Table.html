@@ -1,0 +1,610 @@
+<script>
+
+/* ==========================================================
+ * ATS Table Framework v1.1
+ * ==========================================================
+ */
+
+ATS.table = ATS.table || {};
+ATS.table.instances = ATS.table.instances || {};
+
+/* ==========================================================
+ * Escape HTML
+ * ==========================================================
+ */
+
+ATS.table.escapeHTML = function(value){
+
+    if(value === null || value === undefined){
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+};
+
+/* ==========================================================
+ * Render Table
+ * ==========================================================
+ */
+
+ATS.table.render = function(options = {}){
+
+    const elementId = options.element;
+
+    if(!elementId){
+        console.error("[ATS Table] Element ID belum ditentukan.");
+        return;
+    }
+
+    const container = document.getElementById(elementId);
+
+    if(!container){
+        console.error("[ATS Table] Element tidak ditemukan:", elementId);
+        return;
+    }
+
+    const previousInstance =
+        ATS.table.instances[elementId] || {};
+
+    const instance = {
+
+        element: elementId,
+
+        data: Array.isArray(options.data)
+            ? options.data
+            : [],
+
+        filteredData: Array.isArray(options.data)
+            ? [...options.data]
+            : [],
+
+        columns: Array.isArray(options.columns)
+            ? options.columns
+            : [],
+
+        searchable: options.searchable !== false,
+
+        emptyMessage:
+            options.emptyMessage ||
+            "Data tidak tersedia.",
+
+        loadOptions:
+            previousInstance.loadOptions || null
+
+    };
+
+    ATS.table.instances[elementId] = instance;
+
+    container.innerHTML = `
+
+        <div class="ats-table-wrapper">
+
+            ${
+                instance.searchable
+                    ? `
+                        <div class="ats-table-toolbar">
+
+                            <div class="ats-table-search">
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    data-table-search="${elementId}"
+                                    placeholder="Cari data..."
+                                >
+
+                            </div>
+
+                        </div>
+                    `
+                    : ""
+            }
+
+            <div class="ats-table-container">
+
+                <table class="ats-table">
+
+                    <thead>
+                        ${ATS.table.renderHeader(instance)}
+                    </thead>
+
+                    <tbody data-table-body="${elementId}">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div
+                class="ats-table-empty"
+                data-table-empty="${elementId}"
+                style="display:none;"
+            >
+                ${ATS.table.escapeHTML(instance.emptyMessage)}
+            </div>
+
+        </div>
+
+    `;
+
+    ATS.table.renderBody(elementId);
+    ATS.table.bindSearch(elementId);
+
+};
+
+/* ==========================================================
+ * Render Header
+ * ==========================================================
+ */
+
+ATS.table.renderHeader = function(instance){
+
+    let html = "<tr>";
+
+    instance.columns.forEach(function(column){
+
+        html += `
+            <th>
+                ${ATS.table.escapeHTML(
+                    column.title || column.field || ""
+                )}
+            </th>
+        `;
+
+    });
+
+    html += "</tr>";
+
+    return html;
+
+};
+
+/* ==========================================================
+ * Render Body
+ * ==========================================================
+ */
+
+ATS.table.renderBody = function(elementId){
+
+    const instance = ATS.table.instances[elementId];
+
+    if(!instance){
+        return;
+    }
+
+    const body = document.querySelector(
+        `[data-table-body="${elementId}"]`
+    );
+
+    const empty = document.querySelector(
+        `[data-table-empty="${elementId}"]`
+    );
+
+    if(!body || !empty){
+        return;
+    }
+
+    if(instance.filteredData.length === 0){
+
+        body.innerHTML = "";
+        empty.style.display = "block";
+
+        return;
+
+    }
+
+    empty.style.display = "none";
+
+    let html = "";
+
+    instance.filteredData.forEach(function(row, rowIndex){
+
+        html += "<tr>";
+
+        instance.columns.forEach(function(column){
+
+            let value = row[column.field];
+
+            if(typeof column.render === "function"){
+
+                value = column.render(
+                    row[column.field],
+                    row,
+                    rowIndex
+                );
+
+            }else{
+
+                value = ATS.table.escapeHTML(value);
+
+            }
+
+            html += `
+                <td>
+                    ${value ?? ""}
+                </td>
+            `;
+
+        });
+
+        html += "</tr>";
+
+    });
+
+    body.innerHTML = html;
+
+};
+
+/* ==========================================================
+ * Search
+ * ==========================================================
+ */
+
+ATS.table.bindSearch = function(elementId){
+
+    const input = document.querySelector(
+        `[data-table-search="${elementId}"]`
+    );
+
+    if(!input){
+        return;
+    }
+
+    input.addEventListener("input", function(){
+
+        ATS.table.search(
+            elementId,
+            input.value
+        );
+
+    });
+
+};
+
+ATS.table.search = function(elementId, keyword){
+
+    const instance = ATS.table.instances[elementId];
+
+    if(!instance){
+        return;
+    }
+
+    const query = String(keyword || "")
+        .trim()
+        .toLowerCase();
+
+    if(!query){
+
+        instance.filteredData = [...instance.data];
+
+    }else{
+
+        instance.filteredData = instance.data.filter(function(row){
+
+            return instance.columns.some(function(column){
+
+                const value = row[column.field];
+
+                return String(value ?? "")
+                    .toLowerCase()
+                    .includes(query);
+
+            });
+
+        });
+
+    }
+
+    ATS.table.renderBody(elementId);
+
+};
+
+/* ==========================================================
+ * Reload / Clear
+ * ==========================================================
+ */
+
+ATS.table.reload = function(elementId, data){
+
+    const instance = ATS.table.instances[elementId];
+
+    if(!instance){
+        return;
+    }
+
+    instance.data = Array.isArray(data)
+        ? data
+        : [];
+
+    instance.filteredData = [...instance.data];
+
+    const input = document.querySelector(
+        `[data-table-search="${elementId}"]`
+    );
+
+    if(input){
+        input.value = "";
+    }
+
+    ATS.table.renderBody(elementId);
+
+};
+
+ATS.table.clear = function(elementId){
+
+    ATS.table.reload(elementId, []);
+
+};
+
+/* ==========================================================
+ * Table States
+ * ==========================================================
+ */
+
+ATS.table.loading = function(
+    elementId,
+    message = "Memuat data..."
+){
+
+    const container = document.getElementById(elementId);
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="ats-table-loading">
+            ${ATS.table.escapeHTML(message)}
+        </div>
+    `;
+
+};
+
+ATS.table.empty = function(
+    elementId,
+    message = "Data tidak tersedia."
+){
+
+    const container = document.getElementById(elementId);
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="ats-table-empty">
+            ${ATS.table.escapeHTML(message)}
+        </div>
+    `;
+
+};
+
+ATS.table.error = function(
+    elementId,
+    message = "Gagal memuat data."
+){
+
+    const container = document.getElementById(elementId);
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="ats-table-error">
+            ${ATS.table.escapeHTML(message)}
+        </div>
+    `;
+
+};
+
+/* ==========================================================
+ * API Data Source
+ * ==========================================================
+ */
+
+ATS.table.load = function(options = {}){
+
+    const elementId = options.element;
+    const apiName = options.api;
+
+    if(!elementId){
+        console.error("[ATS Table] Element ID belum ditentukan.");
+        return Promise.reject(
+            new Error("Element ID belum ditentukan.")
+        );
+    }
+
+    if(!apiName){
+        console.error("[ATS Table] Nama API belum ditentukan.");
+        return Promise.reject(
+            new Error("Nama API belum ditentukan.")
+        );
+    }
+
+    ATS.table.instances[elementId] = {
+        loadOptions: options
+    };
+
+    ATS.table.loading(
+        elementId,
+        options.loadingMessage || "Memuat data..."
+    );
+
+    return ATS.api
+        .call(apiName, ...(options.args || []))
+
+        .then(function(result){
+
+            const data = Array.isArray(result)
+                ? result
+                : [];
+
+            ATS.table.render({
+
+                element: elementId,
+
+                data: data,
+
+                columns: options.columns || [],
+
+                searchable:
+                    options.searchable !== false,
+
+                emptyMessage:
+                    options.emptyMessage ||
+                    "Data tidak tersedia."
+
+            });
+
+            if(typeof options.onSuccess === "function"){
+                options.onSuccess(data);
+            }
+
+            return data;
+
+        })
+
+        .catch(function(error){
+
+            console.error("[ATS Table]", error);
+
+            const message =
+                options.errorMessage ||
+                "Gagal memuat data.";
+
+            ATS.table.error(elementId, message);
+
+            if(
+                ATS.toast &&
+                typeof ATS.toast.error === "function"
+            ){
+                ATS.toast.error(message);
+            }
+
+            if(typeof options.onError === "function"){
+                options.onError(error);
+            }
+
+            throw error;
+
+        });
+
+};
+
+/* ==========================================================
+ * Refresh API Data
+ * ==========================================================
+ */
+
+ATS.table.refresh = function(elementId){
+
+    const instance = ATS.table.instances[elementId];
+
+    if(!instance || !instance.loadOptions){
+
+        console.error(
+            "[ATS Table] Konfigurasi load tidak ditemukan:",
+            elementId
+        );
+
+        return Promise.reject(
+            new Error(
+                "Konfigurasi load tidak ditemukan: " +
+                elementId
+            )
+        );
+
+    }
+
+    return ATS.table.load(instance.loadOptions);
+
+};
+
+/* ==========================================================
+ * Temporary Tests
+ * Hapus setelah pengujian selesai
+ * ==========================================================
+ */
+
+function testTable(){
+
+    ATS.table.render({
+
+        element: "testTable",
+
+        data: [
+            {
+                kode: "ATP-001",
+                mapel: "Matematika",
+                kelas: "Kelas 4"
+            },
+            {
+                kode: "ATP-002",
+                mapel: "Bahasa Indonesia",
+                kelas: "Kelas 5"
+            },
+            {
+                kode: "ATP-003",
+                mapel: "IPAS",
+                kelas: "Kelas 6"
+            }
+        ],
+
+        columns: [
+            {
+                field: "kode",
+                title: "Kode"
+            },
+            {
+                field: "mapel",
+                title: "Mata Pelajaran"
+            },
+            {
+                field: "kelas",
+                title: "Kelas"
+            }
+        ]
+
+    });
+
+}
+
+function testLoadATP(){
+
+    ATS.table.load({
+
+        element: "testTable",
+
+        api: "getAllATP",
+
+        columns: [
+            {
+                field: "id",
+                title: "ID"
+            },
+            {
+                field: "kode_atp",
+                title: "Kode ATP"
+            },
+            {
+                field: "nama_atp",
+                title: "Nama ATP"
+            }
+        ],
+
+        emptyMessage: "Data ATP belum tersedia."
+
+    }).catch(function(){
+        // Error sudah ditangani oleh ATS.table.load().
+    });
+
+}
+
+</script>
