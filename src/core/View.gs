@@ -75,9 +75,9 @@ class View {
    * ==========================================================
    */
 
-  static loading(name) {
-    return `src/ui/loading/${name}`;
-  }
+ static loading(name) {
+  return `src/ui/components/${name}`;
+}
 
   static dialog(name) {
     return `src/ui/dialog/${name}`;

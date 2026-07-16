@@ -14,12 +14,17 @@
 
     <?!= View.include(View.css("Style_Main")) ?>
     <?!= View.include(View.css("Toast")) ?>
+    <?!= View.include(View.css("Dialog")) ?>
+    <?!= View.include(View.css("Modal")) ?>
+  
 
     <!-- ===================================================== -->
     <!-- Module CSS -->
     <!-- ===================================================== -->
 
     <?!= View.include(View.module("atp", "Style_ATP")) ?>
+    
+
 
 </head>
 
@@ -66,16 +71,19 @@
     <!-- ===================================================== -->
 
     <?!= View.include(View.js("Toast")) ?>
+    <?!= View.include(View.js("Dialog")) ?>
+    <?!= View.include(View.js("Modal")) ?>
 
     <!--
         Sprint Berikutnya
         =================
-        <?!= View.include(View.js("Dialog")) ?>
-        <?!= View.include(View.js("Modal")) ?>
-        <?!= View.include(View.js("Table")) ?>
-        <?!= View.include(View.js("Form")) ?>
-        <?!= View.include(View.js("Storage")) ?>
-        <?!= View.include(View.js("Validator")) ?>
+        Komponen berikutnya:
+            - Modal
+            - Table
+            - Form
+            - Storage
+            - Validator
+
     -->
 
     <!-- ===================================================== -->
@@ -83,13 +91,15 @@
     <!-- ===================================================== -->
 
     <?!= View.include(View.module("atp", "Script_ATP")) ?>
+   
 
     <!--
         Module Berikutnya
         =================
-        <?!= View.include(View.module("guru","Script_Guru")) ?>
-        <?!= View.include(View.module("mapel","Script_Mapel")) ?>
-        <?!= View.include(View.module("kelas","Script_Kelas")) ?>
+        - Guru
+        - Mapel
+        - Kelas
+
     -->
 
     <!-- ===================================================== -->
@@ -97,7 +107,9 @@
     <!-- ===================================================== -->
 
     <?!= View.include(View.loading("Loading")) ?>
-
+    <?!= View.include(View.dialog("Dialog")) ?>
+    <?!= View.include(View.modal("Modal")) ?>
+    
 </body>
 
 </html>

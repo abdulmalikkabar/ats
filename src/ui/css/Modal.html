@@ -1,0 +1,132 @@
+<style>
+
+/* ==========================================================
+   ATS Modal Framework v1.0
+========================================================== */
+
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:24px;
+    background:rgba(0,0,0,.48);
+    z-index:10020;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .22s ease, visibility .22s ease;
+}
+
+.modal-overlay.show{
+    opacity:1;
+    visibility:visible;
+}
+
+.modal-box{
+    width:100%;
+    max-height:90vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:#FFFFFF;
+    border-radius:12px;
+    box-shadow:0 12px 40px rgba(0,0,0,.28);
+    transform:translateY(-18px) scale(.98);
+    transition:transform .22s ease;
+}
+
+.modal-overlay.show .modal-box{
+    transform:translateY(0) scale(1);
+}
+
+.modal-small{
+    max-width:420px;
+}
+
+.modal-medium{
+    max-width:680px;
+}
+
+.modal-large{
+    max-width:960px;
+}
+
+.modal-full{
+    max-width:calc(100vw - 48px);
+    height:calc(100vh - 48px);
+}
+
+.modal-header{
+    min-height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:16px 20px;
+    color:#FFFFFF;
+    background:var(--primary);
+}
+
+.modal-header h3{
+    margin:0;
+    font-size:18px;
+}
+
+.modal-close{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    color:#FFFFFF;
+    background:transparent;
+    font-size:26px;
+    line-height:1;
+    cursor:pointer;
+    transition:background .2s ease;
+}
+
+.modal-close:hover{
+    background:rgba(255,255,255,.18);
+}
+
+.modal-body{
+    flex:1;
+    padding:22px;
+    overflow:auto;
+    color:var(--text);
+}
+
+.modal-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    padding:15px 20px;
+    border-top:1px solid var(--border);
+    background:#FAFAFA;
+}
+
+body.modal-open{
+    overflow:hidden;
+}
+
+@media (max-width:640px){
+
+    .modal-overlay{
+        align-items:flex-end;
+        padding:0;
+    }
+
+    .modal-box,
+    .modal-small,
+    .modal-medium,
+    .modal-large,
+    .modal-full{
+        max-width:100%;
+        max-height:92vh;
+        border-radius:14px 14px 0 0;
+    }
+
+}
+
+</style>

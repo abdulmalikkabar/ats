@@ -1,0 +1,195 @@
+<script>
+
+/* ==========================================================
+ * ATS Dialog Framework v1.0
+ * ==========================================================
+ */
+
+ATS.dialog = {};
+
+/* ==========================================================
+ * Create Dialog
+ * ==========================================================
+ */
+
+ATS.dialog.create = function(){
+
+    let dialog = document.getElementById("ats-dialog");
+
+    if(dialog){
+
+        return dialog;
+
+    }
+
+    dialog = document.createElement("div");
+
+    dialog.id = "ats-dialog";
+
+    dialog.className = "dialog-overlay";
+
+    dialog.innerHTML = `
+
+        <div class="dialog">
+
+            <div class="dialog-header"></div>
+
+            <div class="dialog-body"></div>
+
+            <div class="dialog-footer"></div>
+
+        </div>
+
+    `;
+
+    document.body.appendChild(dialog);
+
+    return dialog;
+
+};
+
+/* ==========================================================
+ * Alert
+ * ==========================================================
+ */
+
+ATS.dialog.alert = function(options){
+
+    const dialog = ATS.dialog.create();
+
+    dialog.querySelector(".dialog-header").innerHTML =
+        options.title || "Informasi";
+
+    dialog.querySelector(".dialog-body").innerHTML =
+        options.message || "";
+
+    dialog.querySelector(".dialog-footer").innerHTML = `
+
+        <button class="btn btn-primary" id="dialogOK">
+
+            OK
+
+        </button>
+
+    `;
+
+    dialog.classList.add("show");
+
+    document.getElementById("dialogOK").onclick = function(){
+
+        ATS.dialog.close();
+
+        if(options.onClose){
+
+            options.onClose();
+
+        }
+
+    };
+
+};
+
+/* ==========================================================
+ * Confirm
+ * ==========================================================
+ */
+
+ATS.dialog.confirm = function(options){
+
+    const dialog = ATS.dialog.create();
+
+    dialog.querySelector(".dialog-header").innerHTML =
+        options.title || "Konfirmasi";
+
+    dialog.querySelector(".dialog-body").innerHTML =
+        options.message || "";
+
+    dialog.querySelector(".dialog-footer").innerHTML = `
+
+        <button class="btn" id="dialogCancel">
+
+            Batal
+
+        </button>
+
+        <button class="btn btn-primary" id="dialogYes">
+
+            Ya
+
+        </button>
+
+    `;
+
+    dialog.classList.add("show");
+
+    document.getElementById("dialogCancel").onclick = function(){
+
+        ATS.dialog.close();
+
+        if(options.onNo){
+
+            options.onNo();
+
+        }
+
+    };
+
+    document.getElementById("dialogYes").onclick = function(){
+
+        ATS.dialog.close();
+
+        if(options.onYes){
+
+            options.onYes();
+
+        }
+
+    };
+
+};
+
+/* ==========================================================
+ * Close Dialog
+ * ==========================================================
+ */
+
+ATS.dialog.close = function(){
+
+    const dialog = document.getElementById("ats-dialog");
+
+    if(dialog){
+
+        dialog.classList.remove("show");
+
+    }
+
+};
+
+
+function testConfirm(){
+
+    ATS.dialog.confirm({
+
+        title:"Konfirmasi",
+
+        message:"Apakah Anda yakin?",
+
+        onYes(){
+
+            ATS.toast.success("Memilih YA");
+
+        },
+
+        onNo(){
+
+            ATS.toast.info("Memilih BATAL");
+
+        }
+
+    });
+
+}
+
+
+
+</script>

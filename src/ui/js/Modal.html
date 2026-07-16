@@ -1,0 +1,163 @@
+<script>
+
+/* ==========================================================
+ * ATS Modal Framework v1.0
+ * ==========================================================
+ */
+
+ATS.modal = ATS.modal || {};
+
+ATS.modal.getElement = function(){
+
+    return document.getElementById("ats-modal");
+
+};
+
+ATS.modal.getBox = function(){
+
+    const modal = ATS.modal.getElement();
+
+    return modal
+        ? modal.querySelector(".modal-box")
+        : null;
+
+};
+
+ATS.modal.setTitle = function(title){
+
+    const element = document.getElementById("ats-modal-title");
+
+    if(element){
+        element.textContent = title || "Modal";
+    }
+
+};
+
+ATS.modal.setContent = function(content){
+
+    const element = document.getElementById("ats-modal-content");
+
+    if(element){
+        element.innerHTML = content || "";
+    }
+
+};
+
+ATS.modal.setFooter = function(content){
+
+    const element = document.getElementById("ats-modal-footer");
+
+    if(element){
+        element.innerHTML = content || "";
+        element.style.display = content ? "flex" : "none";
+    }
+
+};
+
+ATS.modal.setSize = function(size){
+
+    const box = ATS.modal.getBox();
+
+    if(!box){
+        return;
+    }
+
+    const sizes = [
+        "modal-small",
+        "modal-medium",
+        "modal-large",
+        "modal-full"
+    ];
+
+    sizes.forEach(function(className){
+        box.classList.remove(className);
+    });
+
+    const selected = sizes.includes("modal-" + size)
+        ? "modal-" + size
+        : "modal-medium";
+
+    box.classList.add(selected);
+
+};
+
+ATS.modal.open = function(options = {}){
+
+    const modal = ATS.modal.getElement();
+
+    if(!modal){
+        console.error("[ATS Modal] Template modal tidak ditemukan.");
+        return;
+    }
+
+    ATS.modal.setTitle(options.title || "Modal");
+    ATS.modal.setContent(options.content || "");
+    ATS.modal.setFooter(options.footer || "");
+    ATS.modal.setSize(options.size || "medium");
+
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
+
+    document.body.classList.add("modal-open");
+
+    if(typeof options.onOpen === "function"){
+        options.onOpen();
+    }
+
+};
+
+ATS.modal.close = function(){
+
+    const modal = ATS.modal.getElement();
+
+    if(!modal){
+        return;
+    }
+
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+
+    document.body.classList.remove("modal-open");
+
+};
+
+ATS.modal.initialize = function(){
+
+    const modal = ATS.modal.getElement();
+    const closeButton = document.getElementById("ats-modal-close");
+
+    if(!modal){
+        return;
+    }
+
+    if(closeButton){
+
+        closeButton.addEventListener("click", function(){
+            ATS.modal.close();
+        });
+
+    }
+
+    modal.addEventListener("click", function(event){
+
+        if(event.target === modal){
+            ATS.modal.close();
+        }
+
+    });
+
+    document.addEventListener("keydown", function(event){
+
+        if(event.key === "Escape" && modal.classList.contains("show")){
+            ATS.modal.close();
+        }
+
+    });
+
+};
+
+document.addEventListener("DOMContentLoaded", function(){
+    ATS.modal.initialize();
+});
+
+</script>
