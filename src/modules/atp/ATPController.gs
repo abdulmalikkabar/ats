@@ -23,18 +23,3 @@ class ATPController {
 }
 
 
-/**
- * ==========================================================
- * TEST ATP CONTROLLER
- * ==========================================================
- */
-
-function testATPController() {
-
-  const data = ATPController.getAll();
-
-  Logger.log(
-    JSON.stringify(data, null, 2)
-  );
-
-}

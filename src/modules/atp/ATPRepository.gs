@@ -118,25 +118,3 @@ class ATPRepository {
   }
 }
 
-/**
- * ==========================================================
- * TEST ATP REPOSITORY
- * ==========================================================
- */
-function testATPRepository() {
-
-  const data = ATPRepository.getAll();
-
-  if (data.length == 0) {
-
-    Logger.log("Data kosong");
-
-    return;
-
-  }
-
-  ATPRepository.delete(data[0].ID);
-
-  Logger.log("Delete berhasil");
-
-}

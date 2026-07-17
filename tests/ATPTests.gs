@@ -13,4 +13,45 @@ function testATPService() {
   const result = ATPService.create(data);
 
   Logger.log(JSON.stringify(result, null, 2));
+
+}
+
+/**
+ * ==========================================================
+ * TEST ATP CONTROLLER
+ * ==========================================================
+ */
+
+function testATPController() {
+
+  const data = ATPController.getAll();
+
+  Logger.log(
+    JSON.stringify(data, null, 2)
+  );
+
+}
+
+
+/**
+ * PERINGATAN:
+ * Menghapus record ATP pertama.
+ * Jangan dijalankan pada database produksi.
+ */
+function testATPRepositoryDeleteFirstRecord() {
+
+  const data = ATPRepository.getAll();
+
+  if (data.length == 0) {
+
+    Logger.log("Data kosong");
+
+    return;
+
+  }
+
+  ATPRepository.delete(data[0].ID);
+
+  Logger.log("Delete berhasil");
+
 }
