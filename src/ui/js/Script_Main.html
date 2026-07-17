@@ -13,51 +13,162 @@ ATS.router.load = function(pageName, element){
 
     this.currentPage = pageName;
 
-    
+    ATS.loading.show();
 
     ATS.api
+        .call("getPage", pageName)
 
-    .call("getPage", pageName)
+        .then((html)=>{
 
-    .then((html)=>{
+            const content =
+                document.getElementById("content");
 
-        const content = document.getElementById("content");
+            if(!content){
 
-        content.style.opacity = "0";
+                throw new Error(
+                    'Elemen "#content" tidak ditemukan.'
+                );
 
-        setTimeout(()=>{
+            }
 
-            content.innerHTML = html;
+            content.style.opacity = "0";
 
-            content.style.transition = "opacity .25s";
+            setTimeout(()=>{
 
-            content.style.opacity = "1";
+                content.innerHTML = html;
+
+                content.style.transition =
+                    "opacity .25s";
+
+                content.style.opacity = "1";
+
+                ATS.loading.hide();
+
+                ATS.router.initPage(pageName);
+
+            },200);
+
+        })
+
+        .catch((err)=>{
 
             ATS.loading.hide();
 
-        },200);
+            const content =
+                document.getElementById("content");
 
-    })
+            const message =
+                err && err.message
+                    ? err.message
+                    : String(err);
 
-    .catch((err)=>{
+            if(content){
 
-     
+                content.innerHTML = `
+                    <div class="card">
 
-        document.getElementById("content").innerHTML = `
-            <div class="card">
-                <h3 style="color:red">
-                    Gagal Memuat Halaman
-                </h3>
-                <br>
-                ${err.message}
-            </div>
-        `;
+                        <h3 style="color:red">
+                            Gagal Memuat Halaman
+                        </h3>
 
-    });
+                        <br>
+
+                        ${ATS.router.escape(message)}
+
+                    </div>
+                `;
+
+            }
+
+            console.error(
+                "[ROUTER] Gagal memuat halaman:",
+                err
+            );
+
+        });
 
     ATS.router.active(element);
 
 };
+
+
+/* ==========================================================
+ * Page Initializer
+ * ==========================================================
+ */
+
+ATS.router.initPage = function(pageName){
+
+    console.log(
+        "[ROUTER] Init:",
+        pageName
+    );
+
+    switch(pageName){
+
+        case "Page_ATP":
+
+            /*
+             * Event Handler
+             */
+            if(
+                ATS.ATP &&
+                ATS.ATP.events &&
+                typeof ATS.ATP.events.bind === "function"
+            ){
+
+                ATS.ATP.events.bind();
+
+            }else{
+
+                console.warn(
+                    "[ROUTER] ATS.ATP.events belum tersedia."
+                );
+
+            }
+
+            /*
+             * Table Loader
+             */
+            if(
+                ATS.ATP &&
+                ATS.ATP.table &&
+                typeof ATS.ATP.table.load === "function"
+            ){
+
+                ATS.ATP.table.load();
+
+            }else{
+
+                console.warn(
+                    "[ROUTER] ATS.ATP.table belum tersedia."
+                );
+
+            }
+
+            break;
+
+
+        case "Page_Dashboard":
+
+            console.log(
+                "[ROUTER] Dashboard aktif."
+            );
+
+            break;
+
+
+        default:
+
+            console.log(
+                "[ROUTER] Tidak ada initializer:",
+                pageName
+            );
+
+    }
+
+};
+
 
 /* ==========================================================
  * Active Menu
@@ -68,7 +179,11 @@ ATS.router.active = function(element){
 
     document
         .querySelectorAll(".sidebar-menu li")
-        .forEach(item => item.classList.remove("active"));
+        .forEach((item)=>{
+
+            item.classList.remove("active");
+
+        });
 
     if(element){
 
@@ -78,21 +193,47 @@ ATS.router.active = function(element){
 
 };
 
+
+/* ==========================================================
+ * Escape HTML
+ * ==========================================================
+ */
+
+ATS.router.escape = function(value){
+
+    return String(
+        value ?? ""
+    )
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+};
+
+
 /* ==========================================================
  * Startup
  * ==========================================================
  */
 
-window.onload = function(){
+window.addEventListener(
+    "load",
+    function(){
 
-    const menu = document.querySelector(".sidebar-menu li");
+        const menu =
+            document.querySelector(
+                ".sidebar-menu li"
+            );
 
-    if(menu){
+        if(menu){
 
-        menu.classList.add("active");
+            menu.classList.add("active");
+
+        }
 
     }
-
-};
+);
 
 </script>

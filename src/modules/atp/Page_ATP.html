@@ -1,16 +1,30 @@
-<div class="page">
+<section id="pageATP" class="page">
 
     <div class="page-header">
 
-        <h2>Master ATP</h2>
+        <div>
+            <h2>Master ATP</h2>
+            <p>
+                Kelola Alur Tujuan Pembelajaran.
+            </p>
+        </div>
 
         <div class="toolbar">
 
-            <button onclick="openATPForm()">
+            <button
+                id="btnTambahATP"
+                type="button"
+                class="btn btn-primary"
+                data-action="add"
+            >
                 + Tambah ATP
             </button>
 
-            <button onclick="loadATP()">
+            <button
+                type="button"
+                class="btn"
+                data-action="refresh"
+            >
                 Refresh
             </button>
 
@@ -18,27 +32,33 @@
 
     </div>
 
-    <table class="table">
+    <div class="table-responsive">
 
-        <thead>
+        <table class="table">
 
-            <tr>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Tahun</th>
+                    <th>Semester</th>
+                    <th>Kelas</th>
+                    <th>Mapel</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
 
-                <th>No</th>
-                <th>Tahun</th>
-                <th>Semester</th>
-                <th>Kelas</th>
-                <th>Mapel</th>
-                <th>Aksi</th>
+            <tbody id="tblATP">
 
-            </tr>
+                <tr>
+                    <td colspan="6">
+                        Memuat data ATP...
+                    </td>
+                </tr>
 
-        </thead>
+            </tbody>
 
-        <tbody id="tblATP">
+        </table>
 
-        </tbody>
+    </div>
 
-    </table>
-
-</div>
+</section>

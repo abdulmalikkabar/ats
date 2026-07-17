@@ -1,45 +1,45 @@
 <script>
+(function () {
 
-function loadATP(){
+  function initATPPage() {
 
-    google.script.run
-        .withSuccessHandler(renderATP)
-        .getAllATP();
+    console.log("[ATP] initATPPage dijalankan");
 
-}
+    if (!window.ATS) {
+      console.error("[ATP] window.ATS belum tersedia");
+      return;
+    }
 
-function renderATP(data){
+    if (!ATS.ATP) {
+      console.error("[ATP] ATS.ATP belum tersedia");
+      return;
+    }
 
-    let html="";
+    if (!ATS.ATP.table) {
+      console.error("[ATP] ATS.ATP.table belum tersedia");
+      return;
+    }
 
-    data.forEach((item,index)=>{
+    if (typeof ATS.ATP.table.load !== "function") {
+      console.error("[ATP] ATS.ATP.table.load bukan fungsi");
+      return;
+    }
 
-        html += `
-        <tr>
+    const tableBody = document.getElementById("tblATP");
 
-            <td>${index+1}</td>
+    if (!tableBody) {
+      console.log("[ATP] Halaman ATP belum tampil, load dibatalkan");
+      return;
+    }
 
-            <td>${item.TAHUN}</td>
+    ATS.ATP.table.load();
+  }
 
-            <td>${item.SEMESTER}</td>
+  window.initATPPage = initATPPage;
 
-            <td>${item.KELAS}</td>
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(initATPPage, 100);
+  });
 
-            <td>${item.MAPEL}</td>
-
-            <td>
-
-                Edit
-
-            </td>
-
-        </tr>
-        `;
-
-    });
-
-    document.getElementById("tblATP").innerHTML=html;
-
-}
-
+})();
 </script>

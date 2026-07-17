@@ -1,0 +1,902 @@
+<script>
+
+window.ATS = window.ATS || {};
+ATS.ATP = ATS.ATP || {};
+
+ATS.ATP.form = {
+
+    modalId: "modalATP",
+
+    /**
+     * Membuat elemen modal jika belum tersedia.
+     */
+    ensureModal: function(){
+
+        let modal =
+            document.getElementById(
+                ATS.ATP.form.modalId
+            );
+
+        if(modal){
+            return modal;
+        }
+
+        modal =
+            document.createElement("div");
+
+        modal.id =
+            ATS.ATP.form.modalId;
+
+        modal.className =
+            "ats-modal-overlay";
+
+        modal.style.display = "none";
+
+        modal.innerHTML = `
+            <div class="ats-modal">
+
+                <div class="ats-modal-header">
+
+                    <h3 id="judulFormATP">
+                        Tambah ATP
+                    </h3>
+
+                    <button
+                        type="button"
+                        class="ats-modal-close"
+                        data-action="close-atp-form"
+                        aria-label="Tutup"
+                    >
+                        &times;
+                    </button>
+
+                </div>
+
+                <form id="formATP">
+
+                    <input
+                        type="hidden"
+                        id="atpID"
+                        name="ID"
+                    >
+
+                    <div class="ats-modal-body">
+
+                        <div
+                            id="atpFormError"
+                            class="form-error"
+                            style="display:none;"
+                        ></div>
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+
+                                <label for="kodeATP">
+                                    Kode ATP
+                                </label>
+
+                                <input
+                                    id="kodeATP"
+                                    name="KODE_ATP"
+                                    type="text"
+                                    placeholder="Contoh: ATP-003"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="sekolahATP">
+                                    ID Sekolah
+                                </label>
+
+                                <input
+                                    id="sekolahATP"
+                                    name="SEKOLAH_ID"
+                                    type="text"
+                                    placeholder="Contoh: SCH001"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="mapelATP">
+                                    ID Mata Pelajaran
+                                </label>
+
+                                <input
+                                    id="mapelATP"
+                                    name="MAPEL_ID"
+                                    type="text"
+                                    placeholder="Contoh: MAP001"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="kelasATP">
+                                    ID Kelas
+                                </label>
+
+                                <input
+                                    id="kelasATP"
+                                    name="KELAS_ID"
+                                    type="text"
+                                    placeholder="Contoh: KLS001"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="faseATP">
+                                    ID Fase
+                                </label>
+
+                                <input
+                                    id="faseATP"
+                                    name="FASE_ID"
+                                    type="text"
+                                    placeholder="Contoh: FSA001"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="tahunAjaranATP">
+                                    Tahun Ajaran
+                                </label>
+
+                                <input
+                                    id="tahunAjaranATP"
+                                    name="TAHUN_AJARAN"
+                                    type="text"
+                                    placeholder="Contoh: 2025/2026"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="semesterATP">
+                                    Semester
+                                </label>
+
+                                <select
+                                    id="semesterATP"
+                                    name="SEMESTER"
+                                    required
+                                >
+                                    <option value="">
+                                        Pilih semester
+                                    </option>
+
+                                    <option value="1">
+                                        Ganjil
+                                    </option>
+
+                                    <option value="2">
+                                        Genap
+                                    </option>
+                                </select>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="statusATP">
+                                    Status
+                                </label>
+
+                                <select
+                                    id="statusATP"
+                                    name="STATUS"
+                                >
+                                    <option value="Draft">
+                                        Draft
+                                    </option>
+
+                                    <option value="Aktif">
+                                        Aktif
+                                    </option>
+
+                                    <option value="Arsip">
+                                        Arsip
+                                    </option>
+                                </select>
+
+                            </div>
+
+                            <div
+                                class="form-group"
+                                style="grid-column:1 / -1;"
+                            >
+
+                                <label for="keteranganATP">
+                                    Keterangan
+                                </label>
+
+                                <textarea
+                                    id="keteranganATP"
+                                    name="KETERANGAN"
+                                    rows="4"
+                                    placeholder="Keterangan ATP"
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="ats-modal-footer">
+
+                        <button
+                            type="button"
+                            class="btn"
+                            data-action="close-atp-form"
+                        >
+                            Batal
+                        </button>
+
+                        <button
+                            id="btnSimpanATP"
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Simpan ATP
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        ATS.ATP.form.bindModalEvents();
+
+        return modal;
+
+    },
+
+
+    /**
+     * Memasang event modal dan form.
+     */
+    bindModalEvents: function(){
+
+        const modal =
+            document.getElementById(
+                ATS.ATP.form.modalId
+            );
+
+        if(!modal){
+            return;
+        }
+
+        const form =
+            modal.querySelector("#formATP");
+
+        modal.addEventListener(
+            "click",
+            function(event){
+
+                const closeButton =
+                    event.target.closest(
+                        '[data-action="close-atp-form"]'
+                    );
+
+                if(closeButton){
+                    ATS.ATP.form.close();
+                    return;
+                }
+
+                if(event.target === modal){
+                    ATS.ATP.form.close();
+                }
+
+            }
+        );
+
+        form.addEventListener(
+            "submit",
+            function(event){
+
+                event.preventDefault();
+
+                ATS.ATP.form.submit();
+
+            }
+        );
+
+    },
+
+
+    /**
+     * Membuka form tambah ATP.
+     */
+    open: function(data){
+
+        const modal =
+            ATS.ATP.form.ensureModal();
+
+        ATS.ATP.form.reset();
+
+        if(data){
+            ATS.ATP.form.fill(data);
+        }
+
+        modal.style.display = "flex";
+
+        document.body.style.overflow =
+            "hidden";
+
+        setTimeout(function(){
+
+            const firstInput =
+                document.getElementById(
+                    "kodeATP"
+                );
+
+            if(firstInput){
+                firstInput.focus();
+            }
+
+        }, 50);
+
+    },
+
+
+    /**
+     * Menutup form.
+     */
+    close: function(){
+
+        const modal =
+            document.getElementById(
+                ATS.ATP.form.modalId
+            );
+
+        if(modal){
+            modal.style.display = "none";
+        }
+
+        document.body.style.overflow = "";
+
+        ATS.ATP.form.hideError();
+
+    },
+
+
+    /**
+     * Mengosongkan form.
+     */
+    reset: function(){
+
+        const form =
+            document.getElementById(
+                "formATP"
+            );
+
+        if(!form){
+            return;
+        }
+
+        form.reset();
+
+        document.getElementById(
+            "atpID"
+        ).value = "";
+
+        document.getElementById(
+            "statusATP"
+        ).value = "Draft";
+
+        document.getElementById(
+            "judulFormATP"
+        ).textContent = "Tambah ATP";
+
+        document.getElementById(
+            "btnSimpanATP"
+        ).textContent = "Simpan ATP";
+
+        ATS.ATP.form.hideError();
+
+    },
+
+
+    /**
+     * Mengisi form untuk kebutuhan edit.
+     */
+    fill: function(data){
+
+        data = data || {};
+
+        const setValue =
+            function(id, value){
+
+                const element =
+                    document.getElementById(id);
+
+                if(element){
+
+                    element.value =
+                        value === null ||
+                        value === undefined
+                            ? ""
+                            : value;
+
+                }
+
+            };
+
+        setValue("atpID", data.ID);
+        setValue("kodeATP", data.KODE_ATP);
+        setValue("sekolahATP", data.SEKOLAH_ID);
+        setValue("mapelATP", data.MAPEL_ID);
+        setValue("kelasATP", data.KELAS_ID);
+        setValue("faseATP", data.FASE_ID);
+        setValue("tahunAjaranATP", data.TAHUN_AJARAN);
+        setValue("semesterATP", data.SEMESTER);
+        setValue("statusATP", data.STATUS || "Draft");
+        setValue("keteranganATP", data.KETERANGAN);
+
+        document.getElementById(
+            "judulFormATP"
+        ).textContent = "Edit ATP";
+
+        document.getElementById(
+            "btnSimpanATP"
+        ).textContent = "Simpan Perubahan";
+
+    },
+
+
+    /**
+     * Mengambil data dari form.
+     */
+    getData: function(){
+
+        return {
+
+            ID:
+                ATS.ATP.form.getInputValue(
+                    "atpID"
+                ),
+
+            KODE_ATP:
+                ATS.ATP.form.getInputValue(
+                    "kodeATP"
+                ),
+
+            SEKOLAH_ID:
+                ATS.ATP.form.getInputValue(
+                    "sekolahATP"
+                ),
+
+            MAPEL_ID:
+                ATS.ATP.form.getInputValue(
+                    "mapelATP"
+                ),
+
+            KELAS_ID:
+                ATS.ATP.form.getInputValue(
+                    "kelasATP"
+                ),
+
+            FASE_ID:
+                ATS.ATP.form.getInputValue(
+                    "faseATP"
+                ),
+
+            TAHUN_AJARAN:
+                ATS.ATP.form.getInputValue(
+                    "tahunAjaranATP"
+                ),
+
+            SEMESTER:
+                ATS.ATP.form.getInputValue(
+                    "semesterATP"
+                ),
+
+            STATUS:
+                ATS.ATP.form.getInputValue(
+                    "statusATP"
+                ),
+
+            KETERANGAN:
+                ATS.ATP.form.getInputValue(
+                    "keteranganATP"
+                )
+
+        };
+
+    },
+
+
+    getInputValue: function(id){
+
+        const element =
+            document.getElementById(id);
+
+        if(!element){
+            return "";
+        }
+
+        return String(
+            element.value || ""
+        ).trim();
+
+    },
+
+
+    /**
+     * Validasi data form.
+     */
+    validate: function(data){
+
+        const required = [
+            ["KODE_ATP", "Kode ATP"],
+            ["SEKOLAH_ID", "ID Sekolah"],
+            ["MAPEL_ID", "ID Mata Pelajaran"],
+            ["KELAS_ID", "ID Kelas"],
+            ["FASE_ID", "ID Fase"],
+            ["TAHUN_AJARAN", "Tahun Ajaran"],
+            ["SEMESTER", "Semester"]
+        ];
+
+        for(
+            let index = 0;
+            index < required.length;
+            index++
+        ){
+
+            const field =
+                required[index][0];
+
+            const label =
+                required[index][1];
+
+            if(!data[field]){
+
+                return {
+                    valid: false,
+                    message:
+                        label +
+                        " wajib diisi."
+                };
+
+            }
+
+        }
+
+        if(
+            !/^\d{4}\/\d{4}$/.test(
+                data.TAHUN_AJARAN
+            )
+        ){
+
+            return {
+                valid: false,
+                message:
+                    "Format tahun ajaran harus seperti 2025/2026."
+            };
+
+        }
+
+        if(
+            data.SEMESTER !== "1" &&
+            data.SEMESTER !== "2"
+        ){
+
+            return {
+                valid: false,
+                message:
+                    "Semester tidak valid."
+            };
+
+        }
+
+        return {
+            valid: true
+        };
+
+    },
+
+
+    /**
+     * Mengirim data ke backend.
+     */
+    submit: function(){
+
+        const data =
+            ATS.ATP.form.getData();
+
+        const validation =
+            ATS.ATP.form.validate(data);
+
+        if(!validation.valid){
+
+            ATS.ATP.form.showError(
+                validation.message
+            );
+
+            return;
+
+        }
+
+        ATS.ATP.form.hideError();
+        ATS.ATP.form.setLoading(true);
+
+        google.script.run
+
+            .withSuccessHandler(
+                function(response){
+
+                    ATS.ATP.form.setLoading(
+                        false
+                    );
+
+                    console.log(
+                        "[ATP] saveATP sukses:",
+                        response
+                    );
+
+                    if(
+                        response &&
+                        response.success === false
+                    ){
+
+                        ATS.ATP.form.showError(
+                            response.message ||
+                            "ATP gagal disimpan."
+                        );
+
+                        return;
+
+                    }
+
+                    ATS.ATP.form.close();
+
+                    if(
+                        ATS.toast &&
+                        typeof ATS.toast.success ===
+                            "function"
+                    ){
+
+                        ATS.toast.success(
+                            response &&
+                            response.message
+                                ? response.message
+                                : "Data ATP berhasil disimpan."
+                        );
+
+                    }
+
+                    if(
+                        ATS.ATP.table &&
+                        typeof ATS.ATP.table.refresh ===
+                            "function"
+                    ){
+
+                        ATS.ATP.table.refresh();
+
+                    }
+
+                }
+            )
+
+            .withFailureHandler(
+                function(error){
+
+                    ATS.ATP.form.setLoading(
+                        false
+                    );
+
+                    console.error(
+                        "[ATP] saveATP gagal:",
+                        error
+                    );
+
+                    const message =
+                        error &&
+                        error.message
+                            ? error.message
+                            : "Data ATP gagal disimpan.";
+
+                    ATS.ATP.form.showError(
+                        message
+                    );
+
+                }
+            )
+
+            .saveATP(data);
+
+    },
+
+
+    setLoading: function(isLoading){
+
+        const button =
+            document.getElementById(
+                "btnSimpanATP"
+            );
+
+        if(!button){
+            return;
+        }
+
+        button.disabled = isLoading;
+
+        button.textContent =
+            isLoading
+                ? "Menyimpan..."
+                : (
+                    ATS.ATP.form.getInputValue(
+                        "atpID"
+                    )
+                        ? "Simpan Perubahan"
+                        : "Simpan ATP"
+                );
+
+    },
+
+
+    showError: function(message){
+
+        const errorBox =
+            document.getElementById(
+                "atpFormError"
+            );
+
+        if(!errorBox){
+            return;
+        }
+
+        errorBox.textContent = message;
+        errorBox.style.display = "block";
+
+    },
+
+
+    hideError: function(){
+
+        const errorBox =
+            document.getElementById(
+                "atpFormError"
+            );
+
+        if(!errorBox){
+            return;
+        }
+
+        errorBox.textContent = "";
+        errorBox.style.display = "none";
+
+    }
+
+};
+
+</script>
+
+<style>
+
+.ats-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.55);
+}
+
+.ats-modal {
+    width: min(760px, 100%);
+    max-height: 90vh;
+    overflow: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.ats-modal-header,
+.ats-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+}
+
+.ats-modal-header {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ats-modal-footer {
+    justify-content: flex-end;
+    border-top: 1px solid #e5e7eb;
+}
+
+.ats-modal-header h3 {
+    margin: 0;
+}
+
+.ats-modal-close {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.ats-modal-body {
+    padding: 22px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group label {
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.form-error {
+    margin-bottom: 16px;
+    padding: 11px 13px;
+    border-radius: 8px;
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+@media (max-width: 640px) {
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>

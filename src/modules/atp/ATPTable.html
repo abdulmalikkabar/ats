@@ -1,0 +1,667 @@
+<script>
+
+window.ATS = window.ATS || {};
+ATS.ATP = ATS.ATP || {};
+
+/**
+ * ==========================================================
+ * ATS ATP Table
+ * ==========================================================
+ */
+
+ATS.ATP.table = {
+
+    /**
+     * Memuat data ATP dari server
+     */
+    load: function(){
+
+        console.log("[ATP] table.load dipanggil");
+
+        const tableBody =
+            document.getElementById("tblATP");
+
+        if(!tableBody){
+
+            console.error(
+                '[ATP] Elemen "#tblATP" tidak ditemukan.'
+            );
+
+            return;
+
+        }
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="table-loading">
+                    Memuat data ATP...
+                </td>
+            </tr>
+        `;
+
+        if(
+            typeof google === "undefined" ||
+            !google.script ||
+            !google.script.run
+        ){
+
+            console.error(
+                "[ATP] google.script.run tidak tersedia."
+            );
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="table-error">
+                        Layanan Google Apps Script tidak tersedia.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        console.log(
+            "[ATP] Memanggil fungsi server getAllATP()"
+        );
+
+        google.script.run
+
+            .withSuccessHandler(function(response){
+
+                console.log(
+                    "[ATP] Respons mentah:",
+                    response
+                );
+
+                console.log(
+                    "[ATP] Tipe respons:",
+                    typeof response
+                );
+
+                console.log(
+                    "[ATP] Apakah array:",
+                    Array.isArray(response)
+                );
+
+                const data =
+                    ATS.ATP.table.normalizeResponse(
+                        response
+                    );
+
+                console.log(
+                    "[ATP] Data setelah normalisasi:",
+                    data
+                );
+
+                ATS.ATP.table.render(data);
+
+            })
+
+            .withFailureHandler(function(error){
+
+                console.error(
+                    "[ATP] getAllATP gagal:",
+                    error
+                );
+
+                const message =
+                    error && error.message
+                        ? error.message
+                        : String(
+                            error ||
+                            "Data ATP gagal dimuat."
+                        );
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="table-error"
+                        >
+                            ${ATS.ATP.table.escape(message)}
+                        </td>
+                    </tr>
+                `;
+
+                ATS.ATP.table.showError(message);
+
+            })
+
+            .getAllATP();
+
+    },
+
+
+    /**
+     * Menormalisasi respons server
+     */
+    normalizeResponse: function(response){
+
+        let result = response;
+
+        try {
+
+            /*
+             * Jika respons berupa JSON string
+             */
+            if(typeof result === "string"){
+
+                const trimmed =
+                    result.trim();
+
+                if(trimmed === ""){
+                    return [];
+                }
+
+                result =
+                    JSON.parse(trimmed);
+
+            }
+
+            /*
+             * Jika respons langsung berupa array
+             */
+            if(Array.isArray(result)){
+
+                return result;
+
+            }
+
+            /*
+             * Jika respons null atau undefined
+             */
+            if(
+                result === null ||
+                result === undefined
+            ){
+
+                return [];
+
+            }
+
+            /*
+             * Jika respons berupa wrapper:
+             * { data: [...] }
+             */
+            if(
+                result &&
+                Array.isArray(result.data)
+            ){
+
+                return result.data;
+
+            }
+
+            /*
+             * Jika data masih berupa JSON string:
+             * { data: "[...]" }
+             */
+            if(
+                result &&
+                typeof result.data === "string"
+            ){
+
+                const parsedData =
+                    JSON.parse(result.data);
+
+                if(Array.isArray(parsedData)){
+                    return parsedData;
+                }
+
+            }
+
+            /*
+             * Wrapper:
+             * { result: [...] }
+             */
+            if(
+                result &&
+                Array.isArray(result.result)
+            ){
+
+                return result.result;
+
+            }
+
+            /*
+             * Wrapper:
+             * { payload: [...] }
+             */
+            if(
+                result &&
+                Array.isArray(result.payload)
+            ){
+
+                return result.payload;
+
+            }
+
+            /*
+             * Wrapper:
+             * { rows: [...] }
+             */
+            if(
+                result &&
+                Array.isArray(result.rows)
+            ){
+
+                return result.rows;
+
+            }
+
+            /*
+             * Wrapper:
+             * { success: true, data: [...] }
+             */
+            if(
+                result &&
+                result.success === true &&
+                Array.isArray(result.value)
+            ){
+
+                return result.value;
+
+            }
+
+            console.warn(
+                "[ATP] Bentuk respons tidak dikenali:",
+                result
+            );
+
+            return [];
+
+        } catch(error){
+
+            console.error(
+                "[ATP] Gagal menormalisasi respons:",
+                error,
+                response
+            );
+
+            return [];
+
+        }
+
+    },
+
+
+    /**
+     * Menampilkan data pada tabel
+     */
+    render: function(data){
+
+        console.log(
+            "[ATP] Data yang akan dirender:",
+            data
+        );
+
+        const tableBody =
+            document.getElementById("tblATP");
+
+        if(!tableBody){
+
+            console.error(
+                '[ATP] Elemen "#tblATP" tidak ditemukan saat render.'
+            );
+
+            return;
+
+        }
+
+        if(!Array.isArray(data)){
+
+            console.error(
+                "[ATP] Data render bukan array:",
+                data
+            );
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="table-error">
+                        Format data ATP tidak valid.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        if(data.length === 0){
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="6"
+                        class="table-empty"
+                    >
+                        Belum ada data ATP.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        const rows =
+            data.map(function(item, index){
+
+                item = item || {};
+
+                const id =
+                    ATS.ATP.table.getValue(
+                        item,
+                        [
+                            "ID",
+                            "id"
+                        ]
+                    );
+
+                const tahunAjaran =
+                    ATS.ATP.table.getValue(
+                        item,
+                        [
+                            "TAHUN_AJARAN",
+                            "tahun_ajaran",
+                            "tahunAjaran",
+                            "TAHUN"
+                        ]
+                    );
+
+                const semesterValue =
+                    ATS.ATP.table.getValue(
+                        item,
+                        [
+                            "SEMESTER",
+                            "semester"
+                        ]
+                    );
+
+                const semester =
+                    ATS.ATP.table.formatSemester(
+                        semesterValue
+                    );
+
+                const kelas =
+                    ATS.ATP.table.getValue(
+                        item,
+                        [
+                            "KELAS_ID",
+                            "kelas_id",
+                            "kelasId",
+                            "KELAS"
+                        ]
+                    );
+
+                const mapel =
+                    ATS.ATP.table.getValue(
+                        item,
+                        [
+                            "MAPEL_ID",
+                            "mapel_id",
+                            "mapelId",
+                            "MAPEL"
+                        ]
+                    );
+
+                return `
+                    <tr data-id="${ATS.ATP.table.escape(id)}">
+
+                        <td>
+                            ${index + 1}
+                        </td>
+
+                        <td>
+                            ${ATS.ATP.table.escape(
+                                tahunAjaran
+                            )}
+                        </td>
+
+                        <td>
+                            ${ATS.ATP.table.escape(
+                                semester
+                            )}
+                        </td>
+
+                        <td>
+                            ${ATS.ATP.table.escape(
+                                kelas
+                            )}
+                        </td>
+
+                        <td>
+                            ${ATS.ATP.table.escape(
+                                mapel
+                            )}
+                        </td>
+
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-sm"
+                                data-action="edit"
+                                data-id="${ATS.ATP.table.escape(id)}"
+                                onclick="ATS.ATP.table.edit('${ATS.ATP.table.escapeJs(id)}')"
+                            >
+                                Edit
+                            </button>
+                        </td>
+
+                    </tr>
+                `;
+
+            });
+
+        tableBody.innerHTML =
+            rows.join("");
+
+        console.log(
+            "[ATP] Tabel berhasil dirender:",
+            data.length,
+            "baris"
+        );
+
+    },
+
+
+    /**
+     * Mengambil nilai berdasarkan beberapa kemungkinan key
+     */
+    getValue: function(object, keys){
+
+        if(
+            !object ||
+            !Array.isArray(keys)
+        ){
+
+            return "";
+
+        }
+
+        for(let index = 0; index < keys.length; index++){
+
+            const key =
+                keys[index];
+
+            if(
+                Object.prototype.hasOwnProperty.call(
+                    object,
+                    key
+                ) &&
+                object[key] !== null &&
+                object[key] !== undefined
+            ){
+
+                return object[key];
+
+            }
+
+        }
+
+        return "";
+
+    },
+
+
+    /**
+     * Format semester
+     */
+    formatSemester: function(value){
+
+        if(
+            value === null ||
+            value === undefined ||
+            value === ""
+        ){
+
+            return "";
+
+        }
+
+        const semester =
+            String(value).trim();
+
+        if(
+            semester === "1" ||
+            semester.toLowerCase() === "ganjil"
+        ){
+
+            return "Ganjil";
+
+        }
+
+        if(
+            semester === "2" ||
+            semester.toLowerCase() === "genap"
+        ){
+
+            return "Genap";
+
+        }
+
+        return semester;
+
+    },
+
+
+    /**
+     * Aksi edit ATP
+     */
+    edit: function(id){
+
+        console.log(
+            "[ATP] Edit data:",
+            id
+        );
+
+        if(
+            ATS.ATP.form &&
+            typeof ATS.ATP.form.edit === "function"
+        ){
+
+            ATS.ATP.form.edit(id);
+            return;
+
+        }
+
+        if(
+            ATS.ATP.form &&
+            typeof ATS.ATP.form.open === "function"
+        ){
+
+            ATS.ATP.form.open(id);
+            return;
+
+        }
+
+        console.warn(
+            "[ATP] Fungsi form edit belum tersedia."
+        );
+
+    },
+
+
+    /**
+     * Memuat ulang tabel
+     */
+    refresh: function(){
+
+        console.log(
+            "[ATP] table.refresh dipanggil"
+        );
+
+        ATS.ATP.table.load();
+
+    },
+
+
+    /**
+     * Menampilkan pesan error
+     */
+    showError: function(message){
+
+        if(
+            ATS.toast &&
+            typeof ATS.toast.error === "function"
+        ){
+
+            ATS.toast.error(message);
+            return;
+
+        }
+
+        if(
+            ATS.Toast &&
+            typeof ATS.Toast.error === "function"
+        ){
+
+            ATS.Toast.error(message);
+
+        }
+
+    },
+
+
+    /**
+     * Escape HTML
+     */
+    escape: function(value){
+
+        return String(
+            value === null ||
+            value === undefined
+                ? ""
+                : value
+        )
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    },
+
+
+    /**
+     * Escape string untuk onclick JavaScript
+     */
+    escapeJs: function(value){
+
+        return String(
+            value === null ||
+            value === undefined
+                ? ""
+                : value
+        )
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'")
+            .replace(/\r/g, "\\r")
+            .replace(/\n/g, "\\n");
+
+    }
+
+};
+
+</script>

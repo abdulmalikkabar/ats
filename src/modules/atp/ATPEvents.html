@@ -1,0 +1,100 @@
+<script>
+
+window.ATS = window.ATS || {};
+ATS.ATP = ATS.ATP || {};
+
+ATS.ATP.events = {
+
+    bind: function(){
+
+        const page =
+            document.getElementById(
+                "pageATP"
+            );
+
+        if(!page){
+            return;
+        }
+
+        /*
+         * Mencegah event dipasang berulang kali
+         */
+        if(page.dataset.eventsBound === "true"){
+            return;
+        }
+
+        page.dataset.eventsBound = "true";
+
+        page.addEventListener(
+            "click",
+            function(event){
+
+                const button =
+                    event.target.closest(
+                        "[data-action]"
+                    );
+
+                if(!button){
+                    return;
+                }
+
+                const action =
+                    button.dataset.action;
+
+                const id =
+                    button.dataset.id || "";
+
+                if(action === "add"){
+
+                    ATS.ATP.form.open();
+                    return;
+
+                }
+
+                if(action === "refresh"){
+
+                    ATS.ATP.table.refresh();
+                    return;
+
+                }
+
+                if(action === "edit"){
+
+                    ATS.ATP.events.edit(id);
+
+                }
+
+            }
+        );
+
+    },
+
+
+    edit: function(id){
+
+        console.log(
+            "[ATP] Edit:",
+            id
+        );
+
+        /*
+         * Fitur edit akan dilanjutkan setelah
+         * fitur tambah berhasil.
+         */
+        if(
+            ATS.toast &&
+            typeof ATS.toast.info === "function"
+        ){
+
+            ATS.toast.info(
+                "Fitur edit ATP akan dilanjutkan. ID: " +
+                id
+            );
+
+        }
+
+    }
+
+};
+
+</script>

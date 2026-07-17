@@ -1,0 +1,51 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <h2>Master ATP</h2>
+
+        <div class="toolbar">
+
+            <button
+                id="btnTambahATP"
+                type="button"
+                onclick="ATS.ATP.events.openCreate()"
+            >
+                + Tambah ATP
+            </button>
+
+            <button
+                type="button"
+                onclick="ATS.ATP.table.refresh()"
+            >
+                Refresh
+            </button>
+
+        </div>
+
+    </div>
+
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Tahun</th>
+                <th>Semester</th>
+                <th>Kelas</th>
+                <th>Mapel</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+
+        <tbody id="tblATP">
+            <tr>
+                <td colspan="6">
+                    Memuat data ATP...
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</div>

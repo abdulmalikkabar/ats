@@ -79,23 +79,14 @@
     <?!= View.include(View.js("Utils")) ?>
     <?!= View.include(View.js("Storage")) ?>
 
-    <!--
-        Komponen berikutnya:
-        - Storage
-    -->
-
     <!-- ===================================================== -->
-    <!-- MODULE JAVASCRIPT -->
+    <!-- MODULE JAVASCRIPT: ATP -->
     <!-- ===================================================== -->
 
+    <?!= View.include(View.module("atp", "ATPTable")) ?>
+    <?!= View.include(View.module("atp", "ATPForm")) ?>
+    <?!= View.include(View.module("atp", "ATPEvents")) ?>
     <?!= View.include(View.module("atp", "Script_ATP")) ?>
-
-    <!--
-        Modul berikutnya:
-        - Guru
-        - Mapel
-        - Kelas
-    -->
 
     <!-- ===================================================== -->
     <!-- GLOBAL COMPONENT TEMPLATES -->
