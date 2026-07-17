@@ -20,9 +20,7 @@ function doGet(e) {
  * ==========================================================
  */
 
-function setupATS() {
-  Installer.setup();
-}
+
 
 
 /**
@@ -61,9 +59,7 @@ function getAllATP() {
 
 }
 
-function saveATP(data) {
-  return ATPController.create(data);
-}
+
 
 
 /**
@@ -109,17 +105,7 @@ function getPage(pageName) {
  * ==========================================================
  */
 
-function resetDatabase() {
 
-  PropertiesService
-    .getScriptProperties()
-    .deleteProperty("DATABASE_ID");
-
-  Logger.log(
-    "DATABASE_ID berhasil dihapus."
-  );
-
-}
 
 /**
  * Menyimpan data ATP dari frontend.
