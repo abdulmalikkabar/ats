@@ -108,113 +108,22 @@ function getPage(pageName) {
 
 
 /**
- * Menyimpan data ATP dari frontend.
+ * Menyimpan ATP dari browser.
+ *
+ * Normalisasi, validasi, dan business logic
+ * ditangani oleh ATPService.
  */
 function saveATP(data) {
-
   try {
-
-    if (!data || typeof data !== "object") {
-      throw new Error(
-        "Data ATP tidak valid."
-      );
-    }
-
-    const payload = {
-      KODE_ATP: String(
-        data.KODE_ATP || ""
-      ).trim(),
-
-      SEKOLAH_ID: String(
-        data.SEKOLAH_ID || ""
-      ).trim(),
-
-      MAPEL_ID: String(
-        data.MAPEL_ID || ""
-      ).trim(),
-
-      KELAS_ID: String(
-        data.KELAS_ID || ""
-      ).trim(),
-
-      FASE_ID: String(
-        data.FASE_ID || ""
-      ).trim(),
-
-      TAHUN_AJARAN: String(
-        data.TAHUN_AJARAN || ""
-      ).trim(),
-
-      SEMESTER: String(
-        data.SEMESTER || ""
-      ).trim(),
-
-      STATUS: String(
-        data.STATUS || "Draft"
-      ).trim(),
-
-      KETERANGAN: String(
-        data.KETERANGAN || ""
-      ).trim()
-    };
-
-    if (!payload.KODE_ATP) {
-      throw new Error(
-        "Kode ATP wajib diisi."
-      );
-    }
-
-    if (!payload.SEKOLAH_ID) {
-      throw new Error(
-        "ID Sekolah wajib diisi."
-      );
-    }
-
-    if (!payload.MAPEL_ID) {
-      throw new Error(
-        "ID Mata Pelajaran wajib diisi."
-      );
-    }
-
-    if (!payload.KELAS_ID) {
-      throw new Error(
-        "ID Kelas wajib diisi."
-      );
-    }
-
-    if (!payload.FASE_ID) {
-      throw new Error(
-        "ID Fase wajib diisi."
-      );
-    }
-
-    if (!payload.TAHUN_AJARAN) {
-      throw new Error(
-        "Tahun ajaran wajib diisi."
-      );
-    }
-
-    if (
-      payload.SEMESTER !== "1" &&
-      payload.SEMESTER !== "2"
-    ) {
-      throw new Error(
-        "Semester tidak valid."
-      );
-    }
-
-    const result =
-      ATPController.create(payload);
+    const result = ATPController.create(data);
 
     return {
       success: true,
-      message:
-        "Data ATP berhasil disimpan.",
+      message: "Data ATP berhasil disimpan.",
       data: result || null
     };
 
   } catch (error) {
-
     console.error(
       "[SERVER] saveATP gagal:",
       error
@@ -227,7 +136,5 @@ function saveATP(data) {
           ? error.message
           : "Data ATP gagal disimpan."
     };
-
   }
-
 }
